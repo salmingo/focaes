@@ -9,8 +9,8 @@
 
 // 软件名称、版本与版权
 #define DAEMON_NAME			"focaes"
-#define DAEMON_VERSION		"v0.1 @ July, 2017"
-#define DAEMON_AUTHORITY	"© SVOM Group"
+#define DAEMON_VERSION		"v0.1 @ Sep, 2017"
+#define DAEMON_AUTHORITY	"© SVOM Group, NAOC"
 
 // 软件配置文件
 const char gConfigPath[] = "focaes.xml";

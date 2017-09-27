@@ -4,6 +4,7 @@ focaes_SOURCES=ioservice_keep.cpp msgque_base.cpp tcp_asio.cpp mountproto.cpp te
                CameraBase.cpp \
                apgSampleCmn.cpp CameraApogee.cpp \
                udp_asio.cpp CameraGY.cpp \
+               ObservationSystem.cpp \
                focaes.cpp
 
 focaes_LDFLAGS=-L/usr/local/lib

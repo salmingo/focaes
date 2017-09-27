@@ -96,7 +96,7 @@ am_focaes_OBJECTS = ioservice_keep.$(OBJEXT) msgque_base.$(OBJEXT) \
 	tcp_asio.$(OBJEXT) mountproto.$(OBJEXT) termscreen.$(OBJEXT) \
 	GLog.$(OBJEXT) CameraBase.$(OBJEXT) apgSampleCmn.$(OBJEXT) \
 	CameraApogee.$(OBJEXT) udp_asio.$(OBJEXT) CameraGY.$(OBJEXT) \
-	focaes.$(OBJEXT)
+	ObservationSystem.$(OBJEXT) focaes.$(OBJEXT)
 focaes_OBJECTS = $(am_focaes_OBJECTS)
 am__DEPENDENCIES_1 =
 focaes_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
@@ -159,24 +159,30 @@ am__define_uniq_tagged_files = \
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
-ACLOCAL = ${SHELL} /home/lxm/workspace/focaes/missing aclocal-1.13
+ACLOCAL = ${SHELL} /media/psf/AllFiles/Volumes/Data/workspace/focaes/missing aclocal-1.13
 AMTAR = $${TAR-tar}
 AM_DEFAULT_VERBOSITY = 1
-AUTOCONF = ${SHELL} /home/lxm/workspace/focaes/missing autoconf
-AUTOHEADER = ${SHELL} /home/lxm/workspace/focaes/missing autoheader
-AUTOMAKE = ${SHELL} /home/lxm/workspace/focaes/missing automake-1.13
+AUTOCONF = ${SHELL} /media/psf/AllFiles/Volumes/Data/workspace/focaes/missing autoconf
+AUTOHEADER = ${SHELL} /media/psf/AllFiles/Volumes/Data/workspace/focaes/missing autoheader
+AUTOMAKE = ${SHELL} /media/psf/AllFiles/Volumes/Data/workspace/focaes/missing automake-1.13
 AWK = gawk
+CC = gcc
+CCDEPMODE = depmode=gcc3
+CFLAGS = -g -O2
+CPP = gcc -E
 CPPFLAGS = 
 CXX = g++
 CXXDEPMODE = depmode=gcc3
 CXXFLAGS = -g -O2
 CYGPATH_W = echo
-DEFS = -DPACKAGE_NAME=\"focaes\" -DPACKAGE_TARNAME=\"focaes\" -DPACKAGE_VERSION=\"1.0\" -DPACKAGE_STRING=\"focaes\ 1.0\" -DPACKAGE_BUGREPORT=\"\" -DPACKAGE_URL=\"\" -DPACKAGE=\"focaes\" -DVERSION=\"1.0\"
+DEFS = -DPACKAGE_NAME=\"focaes\" -DPACKAGE_TARNAME=\"focaes\" -DPACKAGE_VERSION=\"0.1\" -DPACKAGE_STRING=\"focaes\ 0.1\" -DPACKAGE_BUGREPORT=\"\" -DPACKAGE_URL=\"\" -DPACKAGE=\"focaes\" -DVERSION=\"0.1\" -DHAVE_MEMSET=1 -DHAVE_MKDIR=1 -DHAVE_SOCKET=1 -DSTDC_HEADERS=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_STDLIB_H=1 -DHAVE_STRING_H=1 -DHAVE_MEMORY_H=1 -DHAVE_STRINGS_H=1 -DHAVE_INTTYPES_H=1 -DHAVE_STDINT_H=1 -DHAVE_UNISTD_H=1 -DHAVE_ARPA_INET_H=1 -DHAVE_LIMITS_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_STDINT_H=1 -DHAVE_STRING_H=1 -DHAVE_UNISTD_H=1 -DHAVE__BOOL=1
 DEPDIR = .deps
 ECHO_C = 
 ECHO_N = -n
 ECHO_T = 
+EGREP = /usr/bin/grep -E
 EXEEXT = 
+GREP = /usr/bin/grep
 INSTALL = /usr/bin/install -c
 INSTALL_DATA = ${INSTALL} -m 644
 INSTALL_PROGRAM = ${INSTALL}
@@ -186,25 +192,26 @@ LDFLAGS =
 LIBOBJS = 
 LIBS = 
 LTLIBOBJS = 
-MAKEINFO = ${SHELL} /home/lxm/workspace/focaes/missing makeinfo
+MAKEINFO = ${SHELL} /media/psf/AllFiles/Volumes/Data/workspace/focaes/missing makeinfo
 MKDIR_P = /usr/bin/mkdir -p
 OBJEXT = o
 PACKAGE = focaes
 PACKAGE_BUGREPORT = 
 PACKAGE_NAME = focaes
-PACKAGE_STRING = focaes 1.0
+PACKAGE_STRING = focaes 0.1
 PACKAGE_TARNAME = focaes
 PACKAGE_URL = 
-PACKAGE_VERSION = 1.0
+PACKAGE_VERSION = 0.1
 PATH_SEPARATOR = :
 SET_MAKE = 
 SHELL = /bin/sh
 STRIP = 
-VERSION = 1.0
-abs_builddir = /home/lxm/workspace/focaes/src
-abs_srcdir = /home/lxm/workspace/focaes/src
-abs_top_builddir = /home/lxm/workspace/focaes
-abs_top_srcdir = /home/lxm/workspace/focaes
+VERSION = 0.1
+abs_builddir = /media/psf/AllFiles/Volumes/Data/workspace/focaes/src
+abs_srcdir = /media/psf/AllFiles/Volumes/Data/workspace/focaes/src
+abs_top_builddir = /media/psf/AllFiles/Volumes/Data/workspace/focaes
+abs_top_srcdir = /media/psf/AllFiles/Volumes/Data/workspace/focaes
+ac_ct_CC = gcc
 ac_ct_CXX = g++
 am__include = include
 am__leading_dot = .
@@ -231,7 +238,7 @@ host_vendor = unknown
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = ${SHELL} /home/lxm/workspace/focaes/install-sh
+install_sh = ${SHELL} /media/psf/AllFiles/Volumes/Data/workspace/focaes/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localedir = ${datarootdir}/locale
@@ -260,6 +267,7 @@ focaes_SOURCES = ioservice_keep.cpp msgque_base.cpp tcp_asio.cpp mountproto.cpp 
                CameraBase.cpp \
                apgSampleCmn.cpp CameraApogee.cpp \
                udp_asio.cpp CameraGY.cpp \
+               ObservationSystem.cpp \
                focaes.cpp
 
 focaes_LDFLAGS = -L/usr/local/lib
@@ -359,6 +367,7 @@ include ./$(DEPDIR)/CameraApogee.Po
 include ./$(DEPDIR)/CameraBase.Po
 include ./$(DEPDIR)/CameraGY.Po
 include ./$(DEPDIR)/GLog.Po
+include ./$(DEPDIR)/ObservationSystem.Po
 include ./$(DEPDIR)/apgSampleCmn.Po
 include ./$(DEPDIR)/focaes.Po
 include ./$(DEPDIR)/ioservice_keep.Po

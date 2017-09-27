@@ -110,6 +110,7 @@ public:
 				onecam.focuser_error = child.second.get("stroke.<xmlattr>.error", 2);
 				onecam.expdur = child.second.get("exposure.<xmlattr>.duration", 2);
 				onecam.frmcnt = child.second.get("exposure.<xmlattr>.count", 3);
+				if (onecam.stroke_start > onecam.stroke_stop) onecam.stroke_step *= -1;
 
 				camera.push_back(onecam);
 			}

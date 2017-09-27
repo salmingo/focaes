@@ -96,7 +96,7 @@ am_focaes_OBJECTS = ioservice_keep.$(OBJEXT) msgque_base.$(OBJEXT) \
 	tcp_asio.$(OBJEXT) mountproto.$(OBJEXT) termscreen.$(OBJEXT) \
 	GLog.$(OBJEXT) CameraBase.$(OBJEXT) apgSampleCmn.$(OBJEXT) \
 	CameraApogee.$(OBJEXT) udp_asio.$(OBJEXT) CameraGY.$(OBJEXT) \
-	focaes.$(OBJEXT)
+	ObservationSystem.$(OBJEXT) focaes.$(OBJEXT)
 focaes_OBJECTS = $(am_focaes_OBJECTS)
 am__DEPENDENCIES_1 =
 focaes_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
@@ -166,6 +166,10 @@ AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
+CC = @CC@
+CCDEPMODE = @CCDEPMODE@
+CFLAGS = @CFLAGS@
+CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
 CXX = @CXX@
 CXXDEPMODE = @CXXDEPMODE@
@@ -176,7 +180,9 @@ DEPDIR = @DEPDIR@
 ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
+EGREP = @EGREP@
 EXEEXT = @EXEEXT@
+GREP = @GREP@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
@@ -205,6 +211,7 @@ abs_builddir = @abs_builddir@
 abs_srcdir = @abs_srcdir@
 abs_top_builddir = @abs_top_builddir@
 abs_top_srcdir = @abs_top_srcdir@
+ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
 am__include = @am__include@
 am__leading_dot = @am__leading_dot@
@@ -260,6 +267,7 @@ focaes_SOURCES = ioservice_keep.cpp msgque_base.cpp tcp_asio.cpp mountproto.cpp 
                CameraBase.cpp \
                apgSampleCmn.cpp CameraApogee.cpp \
                udp_asio.cpp CameraGY.cpp \
+               ObservationSystem.cpp \
                focaes.cpp
 
 focaes_LDFLAGS = -L/usr/local/lib
@@ -359,6 +367,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CameraBase.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CameraGY.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GLog.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ObservationSystem.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apgSampleCmn.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/focaes.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ioservice_keep.Po@am__quote@
