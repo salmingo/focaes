@@ -27,6 +27,7 @@ struct param_config {// 软件配置参数
 	int focuser_error;	//< 调焦器定位误差, 量纲: 微米
 	double expdur;		//< 曝光时间, 量纲: 秒
 	int frmcnt;			//< 曝光帧数
+	bool display;		//< 是否实时显示图像
 
 public:
 	void InitFile(const std::string &filepath) {
@@ -43,6 +44,7 @@ public:
 		pt.put("stroke.<xmlattr>.error", focuser_error = 2);
 		pt.put("exposure.<xmlattr>.duration", expdur = 5);
 		pt.put("exposure.<xmlattr>.count", frmcnt = 1);
+		pt.put("display", display = false);
 
 		boost::property_tree::xml_writer_settings<std::string> settings(' ', 4);
 		write_xml(filepath, pt, std::locale(), settings);
@@ -64,6 +66,7 @@ public:
 		focuser_error = pt.get("stroke.<xmlattr>.error", 2);
 		expdur = pt.get("exposure.<xmlattr>.duration", 2);
 		frmcnt = pt.get("exposure.<xmlattr>.count", 3);
+		display = pt.get("display", false);
 
 		if (stroke_step == 0) stroke_step = 10;
 		if (focuser_error <= 0) focuser_error = 2;
