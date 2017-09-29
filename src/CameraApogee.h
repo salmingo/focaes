@@ -42,17 +42,17 @@ protected:
 	 * @brief 设置读出端口
 	 * @param index 读出端口档位
 	 */
-	void UpdateReadPort(int& index);
+	void UpdateReadPort(uint32_t& index);
 	/*!
 	 * @brief 设置读出速度
 	 * @param index 读出速度档位
 	 */
-	void UpdateReadRate(int& index);
+	void UpdateReadRate(uint32_t& index);
 	/*!
 	 * @brief 设置增益
 	 * @param index 增益档位
 	 */
-	void UpdateGain(int& index);
+	void UpdateGain(uint32_t& index);
 	/*!
 	 * @brief 更新ROI区域
 	 * @param xbin   X轴合并因子
@@ -63,6 +63,11 @@ protected:
 	 * @param height 高度
 	 */
 	void UpdateROI(int& xbin, int& ybin, int& xstart, int& ystart, int& width, int& height);
+	/*!
+	 * @brief 自动调整偏置电压, 使得本底值尽可能接近offset
+	 * @param offset 本底平均期望值
+	 */
+	void UpdateADCOffset(uint16_t offset);
 	/*!
 	 * @brief 查看相机芯片温度
 	 * @return

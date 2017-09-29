@@ -111,6 +111,7 @@ ObservationSystem.o: ObservationSystem.cpp /usr/include/stdc-predef.h \
  /usr/local/include/boost/core/addressof.hpp \
  /usr/local/include/boost/smart_ptr/detail/sp_convertible.hpp \
  /usr/local/include/boost/smart_ptr/detail/sp_nullptr_t.hpp \
+ /usr/local/include/boost/smart_ptr/detail/sp_noexcept.hpp \
  /usr/local/include/boost/smart_ptr/detail/spinlock_pool.hpp \
  /usr/local/include/boost/smart_ptr/detail/spinlock.hpp \
  /usr/local/include/boost/smart_ptr/detail/spinlock_sync.hpp \
@@ -915,14 +916,6 @@ ObservationSystem.o: ObservationSystem.cpp /usr/include/stdc-predef.h \
  /usr/local/include/boost/smart_ptr/make_shared_object.hpp \
  /usr/local/include/boost/smart_ptr/detail/sp_forward.hpp \
  /usr/local/include/boost/smart_ptr/make_shared_array.hpp \
- /usr/local/include/boost/smart_ptr/detail/array_count_impl.hpp \
- /usr/local/include/boost/smart_ptr/detail/array_allocator.hpp \
- /usr/local/include/boost/align/align.hpp \
- /usr/local/include/boost/align/detail/align.hpp \
- /usr/local/include/boost/align/detail/is_alignment.hpp \
- /usr/local/include/boost/smart_ptr/detail/array_traits.hpp \
- /usr/local/include/boost/smart_ptr/detail/array_utility.hpp \
- /usr/local/include/boost/smart_ptr/detail/sp_if_array.hpp \
  /usr/local/include/boost/smart_ptr/allocate_shared_array.hpp \
  /usr/local/include/boost/thread.hpp \
  /usr/local/include/boost/thread/thread.hpp \
@@ -1170,6 +1163,7 @@ ObservationSystem.o: ObservationSystem.cpp /usr/include/stdc-predef.h \
  /usr/local/include/boost/exception/detail/type_info.hpp \
  /usr/include/c++/4.8.2/iomanip \
  /usr/local/include/boost/exception/detail/error_info_impl.hpp \
+ /usr/local/include/boost/exception/detail/shared_ptr.hpp \
  /usr/local/include/boost/exception/diagnostic_information.hpp \
  /usr/local/include/boost/exception/get_error_info.hpp \
  /usr/local/include/boost/exception/current_exception_cast.hpp \
@@ -1779,7 +1773,7 @@ ObservationSystem.o: ObservationSystem.cpp /usr/include/stdc-predef.h \
  /usr/local/include/libapogee-3.0/apogee/CameraStatusRegs.h \
  /usr/local/include/libapogee-3.0/apogee/DefDllExport.h \
  /usr/local/include/libapogee-3.0/apogee/CameraInfo.h CameraGY.h \
- udp_asio.h
+ udp_asio.h gui.h
 
 /usr/include/stdc-predef.h:
 
@@ -2058,6 +2052,8 @@ msgque_base.h:
 /usr/local/include/boost/smart_ptr/detail/sp_convertible.hpp:
 
 /usr/local/include/boost/smart_ptr/detail/sp_nullptr_t.hpp:
+
+/usr/local/include/boost/smart_ptr/detail/sp_noexcept.hpp:
 
 /usr/local/include/boost/smart_ptr/detail/spinlock_pool.hpp:
 
@@ -3707,22 +3703,6 @@ msgque_base.h:
 
 /usr/local/include/boost/smart_ptr/make_shared_array.hpp:
 
-/usr/local/include/boost/smart_ptr/detail/array_count_impl.hpp:
-
-/usr/local/include/boost/smart_ptr/detail/array_allocator.hpp:
-
-/usr/local/include/boost/align/align.hpp:
-
-/usr/local/include/boost/align/detail/align.hpp:
-
-/usr/local/include/boost/align/detail/is_alignment.hpp:
-
-/usr/local/include/boost/smart_ptr/detail/array_traits.hpp:
-
-/usr/local/include/boost/smart_ptr/detail/array_utility.hpp:
-
-/usr/local/include/boost/smart_ptr/detail/sp_if_array.hpp:
-
 /usr/local/include/boost/smart_ptr/allocate_shared_array.hpp:
 
 /usr/local/include/boost/thread.hpp:
@@ -4246,6 +4226,8 @@ msgque_base.h:
 /usr/include/c++/4.8.2/iomanip:
 
 /usr/local/include/boost/exception/detail/error_info_impl.hpp:
+
+/usr/local/include/boost/exception/detail/shared_ptr.hpp:
 
 /usr/local/include/boost/exception/diagnostic_information.hpp:
 
@@ -5540,3 +5522,5 @@ CameraApogee.h:
 CameraGY.h:
 
 udp_asio.h:
+
+gui.h:

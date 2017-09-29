@@ -27,6 +27,10 @@ void CameraBase::register_expose(const ExposeProcess::slot_type& slot) {
 	exposeproc_.connect(slot);
 }
 
+bool CameraBase::IsConnected() {
+	return nfcam_->connected;
+}
+
 bool CameraBase::Connect() {
 	if (nfcam_->connected) return true;
 	if (!OpenCamera()) return false;
@@ -169,15 +173,16 @@ void CameraBase::ThreadExpose() {
 		condexp_.wait(lck);
 		while ((status = CameraState()) == 1) {// 监测曝光过程
 			nfcam_->check_expose(left, percent);
-			if (left > 1.0) ms = 1000;
+			if (left > 0.1) ms = 100;
 			else ms = int(left * 1000);
 			duration = boost::chrono::milliseconds(ms);
 
-			exposeproc_(left, percent, 0);
+			exposeproc_(left, percent, 2);
 			if (ms > 0) boost::this_thread::sleep_for(duration);
 		}
 		if (status == 2) {
 			nfcam_->end_expose();
+			exposeproc_(0.0, 100.0, 2);
 			DownloadImage();
 		}
 		nfcam_->exposing = false;

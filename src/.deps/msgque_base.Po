@@ -69,7 +69,6 @@ msgque_base.o: msgque_base.cpp /usr/include/stdc-predef.h \
  /usr/local/include/boost/type.hpp \
  /usr/local/include/boost/is_placeholder.hpp \
  /usr/local/include/boost/bind/arg.hpp \
- /usr/local/include/boost/static_assert.hpp \
  /usr/local/include/boost/visit_each.hpp \
  /usr/local/include/boost/core/enable_if.hpp \
  /usr/local/include/boost/core/is_same.hpp \
@@ -82,8 +81,17 @@ msgque_base.o: msgque_base.cpp /usr/include/stdc-predef.h \
  /usr/local/include/boost/make_shared.hpp \
  /usr/local/include/boost/smart_ptr/make_shared.hpp \
  /usr/local/include/boost/smart_ptr/make_shared_object.hpp \
- /usr/local/include/boost/smart_ptr/shared_ptr.hpp \
+ /usr/local/include/boost/move/core.hpp \
+ /usr/local/include/boost/move/detail/config_begin.hpp \
+ /usr/local/include/boost/move/detail/workaround.hpp \
+ /usr/local/include/boost/move/detail/type_traits.hpp \
+ /usr/local/include/boost/move/detail/meta_utils.hpp \
+ /usr/local/include/boost/move/detail/meta_utils_core.hpp \
+ /usr/local/include/boost/move/detail/config_end.hpp \
  /usr/local/include/boost/assert.hpp /usr/include/assert.h \
+ /usr/local/include/boost/static_assert.hpp \
+ /usr/local/include/boost/move/utility_core.hpp \
+ /usr/local/include/boost/smart_ptr/shared_ptr.hpp \
  /usr/local/include/boost/checked_delete.hpp \
  /usr/local/include/boost/core/checked_delete.hpp \
  /usr/local/include/boost/throw_exception.hpp \
@@ -128,6 +136,7 @@ msgque_base.o: msgque_base.cpp /usr/include/stdc-predef.h \
  /usr/include/c++/4.8.2/functional \
  /usr/local/include/boost/smart_ptr/detail/sp_convertible.hpp \
  /usr/local/include/boost/smart_ptr/detail/sp_nullptr_t.hpp \
+ /usr/local/include/boost/smart_ptr/detail/sp_noexcept.hpp \
  /usr/local/include/boost/smart_ptr/detail/spinlock_pool.hpp \
  /usr/local/include/boost/smart_ptr/detail/spinlock.hpp \
  /usr/local/include/boost/smart_ptr/detail/spinlock_sync.hpp \
@@ -283,22 +292,14 @@ msgque_base.o: msgque_base.cpp /usr/include/stdc-predef.h \
  /usr/local/include/boost/type_traits/detail/is_mem_fun_pointer_impl.hpp \
  /usr/local/include/boost/type_traits/remove_cv.hpp \
  /usr/local/include/boost/smart_ptr/make_shared_array.hpp \
- /usr/local/include/boost/smart_ptr/detail/array_count_impl.hpp \
- /usr/local/include/boost/smart_ptr/detail/array_allocator.hpp \
- /usr/local/include/boost/align/align.hpp \
- /usr/local/include/boost/align/detail/align.hpp \
- /usr/local/include/boost/align/detail/is_alignment.hpp \
- /usr/local/include/boost/smart_ptr/detail/array_traits.hpp \
- /usr/local/include/boost/smart_ptr/detail/array_utility.hpp \
+ /usr/local/include/boost/smart_ptr/allocate_shared_array.hpp \
  /usr/local/include/boost/type_traits/has_trivial_constructor.hpp \
  /usr/local/include/boost/type_traits/is_default_constructible.hpp \
  /usr/local/include/boost/type_traits/is_volatile.hpp \
  /usr/local/include/boost/type_traits/has_trivial_destructor.hpp \
  /usr/local/include/boost/type_traits/is_destructible.hpp \
- /usr/local/include/boost/type_traits/is_class.hpp \
- /usr/local/include/boost/smart_ptr/detail/sp_if_array.hpp \
- /usr/local/include/boost/smart_ptr/allocate_shared_array.hpp \
- msgque_base.h /usr/local/include/boost/signals2.hpp \
+ /usr/local/include/boost/type_traits/is_class.hpp msgque_base.h \
+ /usr/local/include/boost/signals2.hpp \
  /usr/local/include/boost/signals2/deconstruct.hpp \
  /usr/local/include/boost/shared_ptr.hpp \
  /usr/local/include/boost/type_traits/remove_const.hpp \
@@ -352,14 +353,6 @@ msgque_base.o: msgque_base.cpp /usr/include/stdc-predef.h \
  /usr/local/include/boost/noncopyable.hpp \
  /usr/local/include/boost/core/noncopyable.hpp \
  /usr/local/include/boost/move/utility.hpp \
- /usr/local/include/boost/move/detail/config_begin.hpp \
- /usr/local/include/boost/move/detail/workaround.hpp \
- /usr/local/include/boost/move/utility_core.hpp \
- /usr/local/include/boost/move/core.hpp \
- /usr/local/include/boost/move/detail/type_traits.hpp \
- /usr/local/include/boost/move/detail/meta_utils.hpp \
- /usr/local/include/boost/move/detail/meta_utils_core.hpp \
- /usr/local/include/boost/move/detail/config_end.hpp \
  /usr/local/include/boost/move/traits.hpp \
  /usr/local/include/boost/none.hpp /usr/local/include/boost/none_t.hpp \
  /usr/local/include/boost/utility/compare_pointees.hpp \
@@ -1167,6 +1160,7 @@ msgque_base.o: msgque_base.cpp /usr/include/stdc-predef.h \
  /usr/local/include/boost/exception/detail/type_info.hpp \
  /usr/include/c++/4.8.2/iomanip \
  /usr/local/include/boost/exception/detail/error_info_impl.hpp \
+ /usr/local/include/boost/exception/detail/shared_ptr.hpp \
  /usr/local/include/boost/exception/diagnostic_information.hpp \
  /usr/local/include/boost/exception/get_error_info.hpp \
  /usr/local/include/boost/exception/current_exception_cast.hpp \
@@ -1629,8 +1623,6 @@ msgque_base.o: msgque_base.cpp /usr/include/stdc-predef.h \
 
 /usr/local/include/boost/bind/arg.hpp:
 
-/usr/local/include/boost/static_assert.hpp:
-
 /usr/local/include/boost/visit_each.hpp:
 
 /usr/local/include/boost/core/enable_if.hpp:
@@ -1655,11 +1647,29 @@ msgque_base.o: msgque_base.cpp /usr/include/stdc-predef.h \
 
 /usr/local/include/boost/smart_ptr/make_shared_object.hpp:
 
-/usr/local/include/boost/smart_ptr/shared_ptr.hpp:
+/usr/local/include/boost/move/core.hpp:
+
+/usr/local/include/boost/move/detail/config_begin.hpp:
+
+/usr/local/include/boost/move/detail/workaround.hpp:
+
+/usr/local/include/boost/move/detail/type_traits.hpp:
+
+/usr/local/include/boost/move/detail/meta_utils.hpp:
+
+/usr/local/include/boost/move/detail/meta_utils_core.hpp:
+
+/usr/local/include/boost/move/detail/config_end.hpp:
 
 /usr/local/include/boost/assert.hpp:
 
 /usr/include/assert.h:
+
+/usr/local/include/boost/static_assert.hpp:
+
+/usr/local/include/boost/move/utility_core.hpp:
+
+/usr/local/include/boost/smart_ptr/shared_ptr.hpp:
 
 /usr/local/include/boost/checked_delete.hpp:
 
@@ -1768,6 +1778,8 @@ msgque_base.o: msgque_base.cpp /usr/include/stdc-predef.h \
 /usr/local/include/boost/smart_ptr/detail/sp_convertible.hpp:
 
 /usr/local/include/boost/smart_ptr/detail/sp_nullptr_t.hpp:
+
+/usr/local/include/boost/smart_ptr/detail/sp_noexcept.hpp:
 
 /usr/local/include/boost/smart_ptr/detail/spinlock_pool.hpp:
 
@@ -2081,19 +2093,7 @@ msgque_base.o: msgque_base.cpp /usr/include/stdc-predef.h \
 
 /usr/local/include/boost/smart_ptr/make_shared_array.hpp:
 
-/usr/local/include/boost/smart_ptr/detail/array_count_impl.hpp:
-
-/usr/local/include/boost/smart_ptr/detail/array_allocator.hpp:
-
-/usr/local/include/boost/align/align.hpp:
-
-/usr/local/include/boost/align/detail/align.hpp:
-
-/usr/local/include/boost/align/detail/is_alignment.hpp:
-
-/usr/local/include/boost/smart_ptr/detail/array_traits.hpp:
-
-/usr/local/include/boost/smart_ptr/detail/array_utility.hpp:
+/usr/local/include/boost/smart_ptr/allocate_shared_array.hpp:
 
 /usr/local/include/boost/type_traits/has_trivial_constructor.hpp:
 
@@ -2106,10 +2106,6 @@ msgque_base.o: msgque_base.cpp /usr/include/stdc-predef.h \
 /usr/local/include/boost/type_traits/is_destructible.hpp:
 
 /usr/local/include/boost/type_traits/is_class.hpp:
-
-/usr/local/include/boost/smart_ptr/detail/sp_if_array.hpp:
-
-/usr/local/include/boost/smart_ptr/allocate_shared_array.hpp:
 
 msgque_base.h:
 
@@ -2220,22 +2216,6 @@ msgque_base.h:
 /usr/local/include/boost/core/noncopyable.hpp:
 
 /usr/local/include/boost/move/utility.hpp:
-
-/usr/local/include/boost/move/detail/config_begin.hpp:
-
-/usr/local/include/boost/move/detail/workaround.hpp:
-
-/usr/local/include/boost/move/utility_core.hpp:
-
-/usr/local/include/boost/move/core.hpp:
-
-/usr/local/include/boost/move/detail/type_traits.hpp:
-
-/usr/local/include/boost/move/detail/meta_utils.hpp:
-
-/usr/local/include/boost/move/detail/meta_utils_core.hpp:
-
-/usr/local/include/boost/move/detail/config_end.hpp:
 
 /usr/local/include/boost/move/traits.hpp:
 
@@ -3912,6 +3892,8 @@ msgque_base.h:
 /usr/include/c++/4.8.2/iomanip:
 
 /usr/local/include/boost/exception/detail/error_info_impl.hpp:
+
+/usr/local/include/boost/exception/detail/shared_ptr.hpp:
 
 /usr/local/include/boost/exception/diagnostic_information.hpp:
 

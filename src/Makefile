@@ -94,13 +94,11 @@ am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am_focaes_OBJECTS = ioservice_keep.$(OBJEXT) msgque_base.$(OBJEXT) \
 	tcp_asio.$(OBJEXT) mountproto.$(OBJEXT) termscreen.$(OBJEXT) \
-	GLog.$(OBJEXT) CameraBase.$(OBJEXT) apgSampleCmn.$(OBJEXT) \
-	CameraApogee.$(OBJEXT) udp_asio.$(OBJEXT) CameraGY.$(OBJEXT) \
-	ObservationSystem.$(OBJEXT) focaes.$(OBJEXT)
+	GLog.$(OBJEXT) CameraBase.$(OBJEXT) udp_asio.$(OBJEXT) \
+	CameraGY.$(OBJEXT) focaes.$(OBJEXT)
 focaes_OBJECTS = $(am_focaes_OBJECTS)
 am__DEPENDENCIES_1 =
-focaes_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1)
+focaes_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 focaes_LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(focaes_LDFLAGS) \
 	$(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_$(V))
@@ -159,12 +157,12 @@ am__define_uniq_tagged_files = \
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
-ACLOCAL = ${SHELL} /media/psf/AllFiles/Volumes/Data/workspace/focaes/missing aclocal-1.13
+ACLOCAL = ${SHELL} /media/psf/AllFiles/Volumes/Data/Workspace/focaes/missing aclocal-1.13
 AMTAR = $${TAR-tar}
 AM_DEFAULT_VERBOSITY = 1
-AUTOCONF = ${SHELL} /media/psf/AllFiles/Volumes/Data/workspace/focaes/missing autoconf
-AUTOHEADER = ${SHELL} /media/psf/AllFiles/Volumes/Data/workspace/focaes/missing autoheader
-AUTOMAKE = ${SHELL} /media/psf/AllFiles/Volumes/Data/workspace/focaes/missing automake-1.13
+AUTOCONF = ${SHELL} /media/psf/AllFiles/Volumes/Data/Workspace/focaes/missing autoconf
+AUTOHEADER = ${SHELL} /media/psf/AllFiles/Volumes/Data/Workspace/focaes/missing autoheader
+AUTOMAKE = ${SHELL} /media/psf/AllFiles/Volumes/Data/Workspace/focaes/missing automake-1.13
 AWK = gawk
 CC = gcc
 CCDEPMODE = depmode=gcc3
@@ -175,7 +173,7 @@ CXX = g++
 CXXDEPMODE = depmode=gcc3
 CXXFLAGS = -g -O2
 CYGPATH_W = echo
-DEFS = -DPACKAGE_NAME=\"focaes\" -DPACKAGE_TARNAME=\"focaes\" -DPACKAGE_VERSION=\"0.1\" -DPACKAGE_STRING=\"focaes\ 0.1\" -DPACKAGE_BUGREPORT=\"\" -DPACKAGE_URL=\"\" -DPACKAGE=\"focaes\" -DVERSION=\"0.1\" -DHAVE_MEMSET=1 -DHAVE_MKDIR=1 -DHAVE_SOCKET=1 -DSTDC_HEADERS=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_STDLIB_H=1 -DHAVE_STRING_H=1 -DHAVE_MEMORY_H=1 -DHAVE_STRINGS_H=1 -DHAVE_INTTYPES_H=1 -DHAVE_STDINT_H=1 -DHAVE_UNISTD_H=1 -DHAVE_ARPA_INET_H=1 -DHAVE_LIMITS_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_STDINT_H=1 -DHAVE_STRING_H=1 -DHAVE_UNISTD_H=1 -DHAVE__BOOL=1
+DEFS = -DPACKAGE_NAME=\"focaes\" -DPACKAGE_TARNAME=\"focaes\" -DPACKAGE_VERSION=\"0.1\" -DPACKAGE_STRING=\"focaes\ 0.1\" -DPACKAGE_BUGREPORT=\"\" -DPACKAGE_URL=\"\" -DPACKAGE=\"focaes\" -DVERSION=\"0.1\" -DHAVE_MEMSET=1 -DHAVE_MKDIR=1 -DHAVE_SOCKET=1 -DHAVE_STRCASECMP=1 -DSTDC_HEADERS=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_STDLIB_H=1 -DHAVE_STRING_H=1 -DHAVE_MEMORY_H=1 -DHAVE_STRINGS_H=1 -DHAVE_INTTYPES_H=1 -DHAVE_STDINT_H=1 -DHAVE_UNISTD_H=1 -DHAVE_ARPA_INET_H=1 -DHAVE_LIMITS_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_STDINT_H=1 -DHAVE_STRING_H=1 -DHAVE_UNISTD_H=1 -DHAVE__BOOL=1
 DEPDIR = .deps
 ECHO_C = 
 ECHO_N = -n
@@ -192,7 +190,7 @@ LDFLAGS =
 LIBOBJS = 
 LIBS = 
 LTLIBOBJS = 
-MAKEINFO = ${SHELL} /media/psf/AllFiles/Volumes/Data/workspace/focaes/missing makeinfo
+MAKEINFO = ${SHELL} /media/psf/AllFiles/Volumes/Data/Workspace/focaes/missing makeinfo
 MKDIR_P = /usr/bin/mkdir -p
 OBJEXT = o
 PACKAGE = focaes
@@ -207,10 +205,10 @@ SET_MAKE =
 SHELL = /bin/sh
 STRIP = 
 VERSION = 0.1
-abs_builddir = /media/psf/AllFiles/Volumes/Data/workspace/focaes/src
-abs_srcdir = /media/psf/AllFiles/Volumes/Data/workspace/focaes/src
-abs_top_builddir = /media/psf/AllFiles/Volumes/Data/workspace/focaes
-abs_top_srcdir = /media/psf/AllFiles/Volumes/Data/workspace/focaes
+abs_builddir = /media/psf/AllFiles/Volumes/Data/Workspace/focaes/src
+abs_srcdir = /media/psf/AllFiles/Volumes/Data/Workspace/focaes/src
+abs_top_builddir = /media/psf/AllFiles/Volumes/Data/Workspace/focaes
+abs_top_srcdir = /media/psf/AllFiles/Volumes/Data/Workspace/focaes
 ac_ct_CC = gcc
 ac_ct_CXX = g++
 am__include = include
@@ -238,7 +236,7 @@ host_vendor = unknown
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = ${SHELL} /media/psf/AllFiles/Volumes/Data/workspace/focaes/install-sh
+install_sh = ${SHELL} /media/psf/AllFiles/Volumes/Data/Workspace/focaes/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localedir = ${datarootdir}/locale
@@ -265,17 +263,13 @@ top_srcdir = ..
 focaes_SOURCES = ioservice_keep.cpp msgque_base.cpp tcp_asio.cpp mountproto.cpp termscreen.cpp \
                GLog.cpp \
                CameraBase.cpp \
-               apgSampleCmn.cpp CameraApogee.cpp \
                udp_asio.cpp CameraGY.cpp \
-               ObservationSystem.cpp \
                focaes.cpp
 
 focaes_LDFLAGS = -L/usr/local/lib
-AM_CPPFLAGS = -I/usr/local/include/libapogee-3.0
-COMMON_LIBS = -lpthread -lcurl -lm -lrt -ltiff -lcfitsio -lxpa
+COMMON_LIBS = -lpthread -lm -lrt -lcfitsio -lxpa
 BOOST_LIBS = -lboost_system-mt -lboost_thread-mt
-APOGEE_LIBS = -lapogee
-focaes_LDADD = ${COMMON_LIBS} ${BOOST_LIBS} ${APOGEE_LIBS}
+focaes_LDADD = ${COMMON_LIBS} ${BOOST_LIBS}
 all: all-am
 
 .SUFFIXES:
@@ -363,12 +357,9 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-include ./$(DEPDIR)/CameraApogee.Po
 include ./$(DEPDIR)/CameraBase.Po
 include ./$(DEPDIR)/CameraGY.Po
 include ./$(DEPDIR)/GLog.Po
-include ./$(DEPDIR)/ObservationSystem.Po
-include ./$(DEPDIR)/apgSampleCmn.Po
 include ./$(DEPDIR)/focaes.Po
 include ./$(DEPDIR)/ioservice_keep.Po
 include ./$(DEPDIR)/mountproto.Po

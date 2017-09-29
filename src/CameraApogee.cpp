@@ -87,15 +87,15 @@ void CameraApogee::CoolerOnOff(double& coolerset, bool& onoff) {
 	}
 }
 
-void CameraApogee::UpdateReadPort(int& index) {
+void CameraApogee::UpdateReadPort(uint32_t& index) {
 	//...
 }
 
-void CameraApogee::UpdateReadRate(int& index) {
+void CameraApogee::UpdateReadRate(uint32_t& index) {
 	//...
 }
 
-void CameraApogee::UpdateGain(int& index) {
+void CameraApogee::UpdateGain(uint32_t& index) {
 	//...
 }
 
@@ -122,6 +122,10 @@ void CameraApogee::UpdateROI(int& xbin, int& ybin, int& xstart, int& ystart, int
 	catch(std::runtime_error &ex) {
 		nfcam_->errmsg = ex.what();
 	}
+}
+
+void CameraApogee::UpdateADCOffset(uint16_t offset) {
+	//...保留
 }
 
 double CameraApogee::SensorTemperature() {

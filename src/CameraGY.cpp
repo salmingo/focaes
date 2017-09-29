@@ -66,7 +66,7 @@ bool CameraGY::OpenCamera() {
 
 		/* 初始化参数 */
 		Write(0x0A00,     0x03);		// Set GevCCP
-		Write(0x0D00,     PORT_LOCAL + addr2.to_ulong() % 256);	// Set GevSCPHostPort
+		Write(0x0D00,     PORT_LOCAL);	// Set GevSCPHostPort
 		Write(0x0D04,     1500);		// Set PacketSize
 		Write(0x0D08,     0);			// Set PacketDelay
 		Write(0x0D18,     addrHost);	// Set GevSCDA

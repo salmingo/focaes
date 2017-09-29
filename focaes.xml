@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<version>0.1</version>
+<PortFocus>4012</PortFocus>
+<Device group="001" unit="004"/>
+<stroke start="-100" stop="100" step="10" error="2"/>
+<exposure duration="5" count="1"/>

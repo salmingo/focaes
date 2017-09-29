@@ -94,13 +94,11 @@ am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am_focaes_OBJECTS = ioservice_keep.$(OBJEXT) msgque_base.$(OBJEXT) \
 	tcp_asio.$(OBJEXT) mountproto.$(OBJEXT) termscreen.$(OBJEXT) \
-	GLog.$(OBJEXT) CameraBase.$(OBJEXT) apgSampleCmn.$(OBJEXT) \
-	CameraApogee.$(OBJEXT) udp_asio.$(OBJEXT) CameraGY.$(OBJEXT) \
-	ObservationSystem.$(OBJEXT) focaes.$(OBJEXT)
+	GLog.$(OBJEXT) CameraBase.$(OBJEXT) udp_asio.$(OBJEXT) \
+	CameraGY.$(OBJEXT) focaes.$(OBJEXT)
 focaes_OBJECTS = $(am_focaes_OBJECTS)
 am__DEPENDENCIES_1 =
-focaes_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1)
+focaes_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 focaes_LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(focaes_LDFLAGS) \
 	$(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_@AM_V@)
@@ -265,17 +263,13 @@ top_srcdir = @top_srcdir@
 focaes_SOURCES = ioservice_keep.cpp msgque_base.cpp tcp_asio.cpp mountproto.cpp termscreen.cpp \
                GLog.cpp \
                CameraBase.cpp \
-               apgSampleCmn.cpp CameraApogee.cpp \
                udp_asio.cpp CameraGY.cpp \
-               ObservationSystem.cpp \
                focaes.cpp
 
 focaes_LDFLAGS = -L/usr/local/lib
-AM_CPPFLAGS = -I/usr/local/include/libapogee-3.0
-COMMON_LIBS = -lpthread -lcurl -lm -lrt -ltiff -lcfitsio -lxpa
+COMMON_LIBS = -lpthread -lm -lrt -lcfitsio -lxpa
 BOOST_LIBS = -lboost_system-mt -lboost_thread-mt
-APOGEE_LIBS = -lapogee
-focaes_LDADD = ${COMMON_LIBS} ${BOOST_LIBS} ${APOGEE_LIBS}
+focaes_LDADD = ${COMMON_LIBS} ${BOOST_LIBS}
 all: all-am
 
 .SUFFIXES:
@@ -363,12 +357,9 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CameraApogee.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CameraBase.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CameraGY.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GLog.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ObservationSystem.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apgSampleCmn.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/focaes.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ioservice_keep.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mountproto.Po@am__quote@

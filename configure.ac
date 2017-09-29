@@ -10,7 +10,7 @@ AM_INIT_AUTOMAKE()
 AC_PROG_CC
 AC_PROG_CXX
 
-AC_CHECK_FUNCS([memset mkdir socket])
+AC_CHECK_FUNCS([memset mkdir socket strcasecmp])
 AC_CHECK_HEADERS([arpa/inet.h limits.h netinet/in.h stdint.h string.h unistd.h])
 AC_CHECK_HEADER_STDBOOL
 

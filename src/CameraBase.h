@@ -170,6 +170,12 @@ public:
 public:
 	boost::shared_ptr<devcam_info> GetCameraInfo();
 	/*!
+	 * @brief 相机连接标志
+	 * @return
+	 * 是否已经建立与相机连接标志
+	 */
+	bool IsConnected();
+	/*!
 	 * @brief 尝试连接相机
 	 * @return
 	 * 相机连接结果
