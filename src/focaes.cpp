@@ -431,7 +431,8 @@ bool SaveFITSFile() {
 
 	// 创建目录结构
 	if (state.frmno == 1) {
-		sprintf(buff, "G%s_%s_%s", param.unitid.c_str(), state.cid.c_str(),
+		sprintf(buff, "%s/G%s_%s_%s", param.pathroot.c_str(),
+				param.unitid.c_str(), state.cid.c_str(),
 				nfcam->utcdate.c_str());
 		state.pathname = buff;
 		if (access(state.pathname.c_str(), F_OK)) mkdir(state.pathname.c_str(), 0755);

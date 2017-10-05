@@ -28,6 +28,7 @@ struct param_config {// 软件配置参数
 	double expdur;		//< 曝光时间, 量纲: 秒
 	int frmcnt;			//< 曝光帧数
 	bool display;		//< 是否实时显示图像
+	std::string pathroot;//< 文件存储根路径
 
 public:
 	void InitFile(const std::string &filepath) {
@@ -45,6 +46,7 @@ public:
 		pt.put("exposure.<xmlattr>.duration", expdur = 5);
 		pt.put("exposure.<xmlattr>.count", frmcnt = 1);
 		pt.put("display", display = false);
+		pt.put("PathRoot", pathroot = "/data");
 
 		boost::property_tree::xml_writer_settings<std::string> settings(' ', 4);
 		write_xml(filepath, pt, std::locale(), settings);
@@ -67,6 +69,8 @@ public:
 		expdur = pt.get("exposure.<xmlattr>.duration", 2);
 		frmcnt = pt.get("exposure.<xmlattr>.count", 3);
 		display = pt.get("display", false);
+		pathroot= pt.get("PathRoot", "/data");
+		boost::trim_right_if(pathroot, boost::is_punct() || boost::is_space());
 
 		if (stroke_step == 0) stroke_step = 10;
 		if (focuser_error <= 0) focuser_error = 2;
