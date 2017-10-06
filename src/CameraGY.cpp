@@ -189,7 +189,7 @@ bool CameraGY::StartExpose(double duration, bool light) {
 // 中止当前曝光过程
 void CameraGY::StopExpose() {
 	aborted_ = true;
-	Write(0x20050, 0x1);	// 中断且抛弃已累积数据
+	if (Write(0x20050, 0x1)) state_ = 0; // 中断且抛弃已累积数据
 }
 
 // 相机工作状态
