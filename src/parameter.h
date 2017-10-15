@@ -35,18 +35,18 @@ public:
 		using boost::property_tree::ptree;
 
 		ptree pt;
-		pt.put("version", "0.1");
-		pt.put("PortFocus", portFocus  = 4012);
-		pt.put("Device.<xmlattr>.group", grpid  = "001");
-		pt.put("Device.<xmlattr>.unit",  unitid = "001");
-		pt.put("stroke.<xmlattr>.start", stroke_start = -100);
-		pt.put("stroke.<xmlattr>.stop",  stroke_stop = 100);
-		pt.put("stroke.<xmlattr>.step",  stroke_step = 10);
-		pt.put("stroke.<xmlattr>.error", focuser_error = 2);
-		pt.put("exposure.<xmlattr>.duration", expdur = 5);
-		pt.put("exposure.<xmlattr>.count", frmcnt = 1);
-		pt.put("display", display = false);
-		pt.put("PathRoot", pathroot = "/data");
+		pt.add("version", "0.1");
+		pt.add("PortFocus", portFocus  = 4012);
+		pt.add("Device.<xmlattr>.group", grpid  = "001");
+		pt.add("Device.<xmlattr>.unit",  unitid = "001");
+		pt.add("stroke.<xmlattr>.start", stroke_start = -100);
+		pt.add("stroke.<xmlattr>.stop",  stroke_stop = 100);
+		pt.add("stroke.<xmlattr>.step",  stroke_step = 10);
+		pt.add("stroke.<xmlattr>.error", focuser_error = 2);
+		pt.add("exposure.<xmlattr>.duration", expdur = 5);
+		pt.add("exposure.<xmlattr>.count", frmcnt = 1);
+		pt.add("display", display = false);
+		pt.add("PathRoot", pathroot = "/data");
 
 		boost::property_tree::xml_writer_settings<std::string> settings(' ', 4);
 		write_xml(filepath, pt, std::locale(), settings);
