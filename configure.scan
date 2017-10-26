@@ -11,20 +11,12 @@ AC_PROG_CXX
 AC_PROG_CC
 
 # Checks for libraries.
-# FIXME: Replace `main' with a function in `-lapogee':
-AC_CHECK_LIB([apogee], [main])
 # FIXME: Replace `main' with a function in `-lcfitsio':
 AC_CHECK_LIB([cfitsio], [main])
-# FIXME: Replace `main' with a function in `-lcurl':
-AC_CHECK_LIB([curl], [main])
 # FIXME: Replace `main' with a function in `-lm':
 AC_CHECK_LIB([m], [main])
 # FIXME: Replace `main' with a function in `-lpthread':
 AC_CHECK_LIB([pthread], [main])
-# FIXME: Replace `main' with a function in `-lrt':
-AC_CHECK_LIB([rt], [main])
-# FIXME: Replace `main' with a function in `-ltiff':
-AC_CHECK_LIB([tiff], [main])
 # FIXME: Replace `main' with a function in `-lxpa':
 AC_CHECK_LIB([xpa], [main])
 

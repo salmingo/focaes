@@ -675,20 +675,17 @@ int main(int argc, char** argv) {
 							int cid;
 
 							if ((token = strtok(NULL, seps)) == NULL || atoi(token) == 5) {// U9000
-//								fmt % (atoi(param.unitid.c_str()) * 10 + 5); // 相机编号编码格式1
-/*
-								fmt % ((atoi(param.unitid.c_str()) - 1) * 5 + 5); // 相机编号编码格式2
+								fmt % (atoi(param.unitid.c_str()) * 10 + 5); // 相机编号编码格式1
 								state.cid = fmt.str();
 								state.termtype = "FFoV";
-								boost::shared_ptr<CameraApogee> ccd = boost::make_shared<CameraApogee>();
-								camera = boost::static_pointer_cast<CameraBase>(ccd);
-*/
+//								boost::shared_ptr<CameraApogee> ccd = boost::make_shared<CameraApogee>();
+//								camera = boost::static_pointer_cast<CameraBase>(ccd);
 							}
 							else {// GWAC GY
 								using boost::asio::ip::address_v4;
 								std::string camip = token;
 								address_v4 addr = address_v4::from_string(camip.c_str());
-								fmt % ((atoi(param.unitid.c_str()) - 1) * 5 + (addr.to_ulong() % 256) % 10);
+								fmt % (addr.to_ulong() % 256);
 								state.cid = fmt.str();
 								state.termtype = "JFoV";
 								boost::shared_ptr<CameraGY> ccd = boost::make_shared<CameraGY>(camip);

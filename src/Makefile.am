@@ -6,6 +6,6 @@ focaes_SOURCES=ioservice_keep.cpp msgque_base.cpp tcp_asio.cpp mountproto.cpp te
                focaes.cpp
 
 focaes_LDFLAGS=-L/usr/local/lib
-COMMON_LIBS=-lpthread -lm -lrt -lcfitsio -lxpa
+COMMON_LIBS=-lpthread -lm -lcfitsio -lxpa
 BOOST_LIBS=-lboost_system-mt -lboost_thread-mt
 focaes_LDADD=${COMMON_LIBS} ${BOOST_LIBS}

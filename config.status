@@ -431,11 +431,11 @@ Copyright (C) 2012 Free Software Foundation, Inc.
 This config.status script is free software; the Free Software Foundation
 gives unlimited permission to copy, distribute and modify it."
 
-ac_pwd='/media/psf/AllFiles/Users/lxm/Workspace/focaes'
+ac_pwd='/Users/lxm/Workspace/focaes'
 srcdir='.'
 INSTALL='/usr/bin/install -c'
-MKDIR_P='/usr/bin/mkdir -p'
-AWK='gawk'
+MKDIR_P='./install-sh -c -d'
+AWK='awk'
 test -n "$AWK" || AWK=awk
 # The default lists apply if the user does not specify any file.
 ac_need_defaults=:
@@ -635,17 +635,17 @@ S["am__tar"]="$${TAR-tar} chof - \"$$tardir\""
 S["AMTAR"]="$${TAR-tar}"
 S["am__leading_dot"]="."
 S["SET_MAKE"]=""
-S["AWK"]="gawk"
+S["AWK"]="awk"
 S["mkdir_p"]="$(MKDIR_P)"
-S["MKDIR_P"]="/usr/bin/mkdir -p"
+S["MKDIR_P"]="./install-sh -c -d"
 S["INSTALL_STRIP_PROGRAM"]="$(install_sh) -c -s"
 S["STRIP"]=""
-S["install_sh"]="${SHELL} /media/psf/AllFiles/Users/lxm/Workspace/focaes/install-sh"
-S["MAKEINFO"]="${SHELL} /media/psf/AllFiles/Users/lxm/Workspace/focaes/missing makeinfo"
-S["AUTOHEADER"]="${SHELL} /media/psf/AllFiles/Users/lxm/Workspace/focaes/missing autoheader"
-S["AUTOMAKE"]="${SHELL} /media/psf/AllFiles/Users/lxm/Workspace/focaes/missing automake-1.13"
-S["AUTOCONF"]="${SHELL} /media/psf/AllFiles/Users/lxm/Workspace/focaes/missing autoconf"
-S["ACLOCAL"]="${SHELL} /media/psf/AllFiles/Users/lxm/Workspace/focaes/missing aclocal-1.13"
+S["install_sh"]="${SHELL} /Users/lxm/Workspace/focaes/install-sh"
+S["MAKEINFO"]="${SHELL} /Users/lxm/Workspace/focaes/missing makeinfo"
+S["AUTOHEADER"]="${SHELL} /Users/lxm/Workspace/focaes/missing autoheader"
+S["AUTOMAKE"]="${SHELL} /Users/lxm/Workspace/focaes/missing automake-1.15"
+S["AUTOCONF"]="${SHELL} /Users/lxm/Workspace/focaes/missing autoconf"
+S["ACLOCAL"]="${SHELL} /Users/lxm/Workspace/focaes/missing aclocal-1.15"
 S["VERSION"]="0.1"
 S["PACKAGE"]="focaes"
 S["CYGPATH_W"]="echo"
@@ -653,25 +653,25 @@ S["am__isrc"]=""
 S["INSTALL_DATA"]="${INSTALL} -m 644"
 S["INSTALL_SCRIPT"]="${INSTALL}"
 S["INSTALL_PROGRAM"]="${INSTALL}"
-S["target_os"]="linux-gnu"
-S["target_vendor"]="unknown"
+S["target_os"]="darwin16.7.0"
+S["target_vendor"]="apple"
 S["target_cpu"]="x86_64"
-S["target"]="x86_64-unknown-linux-gnu"
-S["host_os"]="linux-gnu"
-S["host_vendor"]="unknown"
+S["target"]="x86_64-apple-darwin16.7.0"
+S["host_os"]="darwin16.7.0"
+S["host_vendor"]="apple"
 S["host_cpu"]="x86_64"
-S["host"]="x86_64-unknown-linux-gnu"
-S["build_os"]="linux-gnu"
-S["build_vendor"]="unknown"
+S["host"]="x86_64-apple-darwin16.7.0"
+S["build_os"]="darwin16.7.0"
+S["build_vendor"]="apple"
 S["build_cpu"]="x86_64"
-S["build"]="x86_64-unknown-linux-gnu"
+S["build"]="x86_64-apple-darwin16.7.0"
 S["target_alias"]=""
 S["host_alias"]=""
 S["build_alias"]=""
 S["LIBS"]=""
 S["ECHO_T"]=""
-S["ECHO_N"]="-n"
-S["ECHO_C"]=""
+S["ECHO_N"]=""
+S["ECHO_C"]="\\c"
 S["DEFS"]="-DPACKAGE_NAME=\\\"focaes\\\" -DPACKAGE_TARNAME=\\\"focaes\\\" -DPACKAGE_VERSION=\\\"0.1\\\" -DPACKAGE_STRING=\\\"focaes\\ 0.1\\\" -DPACKAGE_BUGREPORT=\\\"\\\" -DPACKAGE"\
 "_URL=\\\"\\\" -DPACKAGE=\\\"focaes\\\" -DVERSION=\\\"0.1\\\" -DHAVE_MEMSET=1 -DHAVE_MKDIR=1 -DHAVE_SOCKET=1 -DHAVE_STRCASECMP=1 -DSTDC_HEADERS=1 -DHAVE_SYS_TYPE"\
 "S_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_STDLIB_H=1 -DHAVE_STRING_H=1 -DHAVE_MEMORY_H=1 -DHAVE_STRINGS_H=1 -DHAVE_INTTYPES_H=1 -DHAVE_STDINT_H=1 -DHAVE_UNIS"\
