@@ -8,6 +8,10 @@
  Version     : 0.1
  */
 
+#include <boost/interprocess/ipc/message_queue.hpp>
+#include <longnam.h>
+#include <fitsio.h>
+#include <xpa.h>
 #include "globaldef.h"
 #include "GLog.h"
 #include "gui.h"
@@ -16,12 +20,9 @@
 #include "tcp_asio.h"
 #include "mountproto.h"
 #include "CameraBase.h"
-//#include "CameraApogee.h"
+#include "CameraApogee.h"
 #include "CameraGY.h"
-#include <boost/interprocess/ipc/message_queue.hpp>
-#include <longnam.h>
-#include <fitsio.h>
-#include <xpa.h>
+#include "FileTransferClient.h"
 
 //////////////////////////////////////////////////////////////////////////////
 #define VALID_FOCUS 10000
@@ -111,7 +112,7 @@ struct focuser {// 调焦器
 
 public:
 	void reset() {
-		posAct = posTar = 100;//VALID_FOCUS;
+		posAct = posTar = VALID_FOCUS;
 		repeat = 0;
 	}
 };
@@ -136,6 +137,7 @@ boost::mutex mtxcur;	//< 光标互斥区
 static char flags[] = "|/-\\";
 static int iflag(-1);
 bool firstimg(true);
+boost::shared_ptr<FileTransferClient> ftcli;	// 文件上传接口
 
 //////////////////////////////////////////////////////////////////////////////
 /// 全局函数
@@ -304,6 +306,14 @@ void DisplayImage() {// display fits image
 	}
 }
 /*==========================================================================*/
+void UploadFile() {// 上传文件
+	FileTransferClient::upload_file file;
+	file.grid_id = param.grpid;
+	file.filename = state.filename;
+	file.filepath = state.filepath;
+	ftcli->NewFile(&file);
+}
+/*==========================================================================*/
 /*!
  * @brief 设置焦点目标位置
  * @param target 目标位置
@@ -448,11 +458,11 @@ void ResolveFocus() {
 				if (boost::iequals(proto->group_id, param.grpid)
 					&& boost::iequals(proto->unit_id, param.unitid)
 					&& boost::iequals(proto->camera_id, state.cid)
-					&& set_focus_real(proto->position
-					&& state.mode == MODE_AUTO)) {// 处理焦点位置
+					&& set_focus_real(proto->position)
+					&& state.mode == MODE_AUTO) {// 处理焦点位置
 					int code = focuser_arrive();
 					if (!code) {
-						if (abs(param.stroke_start - param.stroke_step - focus.posAct) < param.focuser_error)// 空回, 消隙
+						if (abs(param.stroke_start - param.stroke_back - focus.posAct) < param.focuser_error)// 空回, 消隙
 							set_focus_target(param.stroke_start);
 						else {// 开始曝光
 							camera->Expose(state.expdur, state.imgtype == IMGTYPE_OBJECT);
@@ -555,6 +565,7 @@ bool SaveFITSFile() {
 void ExposeComplete() {
 	++state.frmno;
 	SaveFITSFile();
+	if (param.bfts && ftcli.unique() && state.mode == MODE_AUTO) UploadFile();
 	if (param.display) DisplayImage();
 
 	PrintXY(1, LINE_STATUS, "file<%d/%d>: \033[93;49m\033[1m%s\033[0m",
@@ -686,7 +697,238 @@ void StopMessageQueue() {
 }
 /*==========================================================================*/
 //////////////////////////////////////////////////////////////////////////////
+int MainBody() {// 主工作流程
+	char input[100], command[100], ch;
+	char *token;
+	char seps[] = " ,;\t";
+	int pos(0), n;
+
+//////////////////////////////////////////////////////////////////////////////
+// 准备工作环境
+	param.LoadFile(gConfigPath);
+	if (!StartServerFocus()) {
+		gLog1.Write(LOG_FAULT, "", "Failed to create TCP server for focuser");
+		return -1;
+	}
+
+	if (!StartMessageQueue()) {
+		gLog1.Write(LOG_FAULT, "", "Failed to create message queue");
+		return -2;
+	}
+	mntproto = boost::make_shared<mount_proto>();
+	if (param.display) system("ds9&");
+	if (param.bfts) {
+		ftcli = boost::make_shared<FileTransferClient>();
+		ftcli->SetHost(param.ipfts, param.portfts);
+		ftcli->Start();
+	}
+
+	ClearScreen();
+	PrintHelp();
+	PrintServer();
+	PrintAutoParameter();
+	PrintInput();
+
+//////////////////////////////////////////////////////////////////////////////
+	while (1) {
+		if ((ch = getchar()) != '\r' && ch !='\n') {
+			input[pos++] = (char) ch;
+			mutex_lock lck(mtxcur);
+			++curpos;
+		}
+		else if (pos) {
+			input[pos] = 0;
+			pos = 0;
+			strcpy(command, input);
+			token = strtok(command, seps); // 第一个token为关键字或者其它...
+
+			if (!(strcmp(input, "Q") && strcasecmp(input, "quit"))) break;
+
+			if (!strcasecmp(token, "on")) {// 尝试连接相机
+				if (camera.unique() && camera->IsConnected())
+					PrintXY(1, LINE_ERROR, "camera had connected");
+				else {// 依据参数选择待连接相机
+					std::string camid; // 相机标志
+					boost::format fmt("%03d");
+					int cid;
+
+					if ((token = strtok(NULL, seps)) == NULL || atoi(token) == 5) {// U9000
+						fmt % (atoi(param.unitid.c_str()) * 10 + 5); // 相机编号编码格式1
+						state.cid = fmt.str();
+						state.termtype = "FFoV";
+						boost::shared_ptr<CameraApogee> ccd = boost::make_shared<CameraApogee>();
+						camera = boost::static_pointer_cast<CameraBase>(ccd);
+					}
+					else {// GWAC GY
+						using boost::asio::ip::address_v4;
+						std::string camip = token;
+						address_v4 addr = address_v4::from_string(camip.c_str());
+						fmt % (addr.to_ulong() % 256);
+						state.cid = fmt.str();
+						state.termtype = "JFoV";
+						boost::shared_ptr<CameraGY> ccd = boost::make_shared<CameraGY>(camip);
+						camera = boost::static_pointer_cast<CameraGY>(ccd);
+					}
+					if (!camera->Connect()) {
+						PrintXY(1, LINE_ERROR, "failed to connect camera: %s", camera->GetCameraInfo()->errmsg.c_str());
+						camera.reset();
+						state.reset();
+					}
+					else {
+						PrintXY(1, LINE_STATUS, "camera<%s> connected", state.cid.c_str());
+						ClearError();
+						const ExposeProcess::slot_type& slot = boost::bind(&ExposeProcessCB, _1, _2, _3);
+						camera->register_expose(slot);
+
+						if (param.bfts && ftcli.unique()) {
+							ftcli->SetDeviceID(param.grpid, param.unitid, state.cid);
+						}
+					}
+				}
+			}
+			else if (!strcasecmp(token, "off")) {// 尝试断开相机
+				if (!camera.unique() || !camera->IsConnected())
+					PrintXY(1, LINE_ERROR, "camera is off-line");
+				else if (state.mode != MODE_INIT)
+					PrintXY(1, LINE_ERROR, "camera being in exposure");
+				else {
+					camera->Disconnect();
+					if (camera->IsConnected())
+						PrintXY(1, LINE_ERROR, "failed to disconnect camera");
+					else {
+						PrintXY(1, LINE_STATUS, "camera disconnected");
+						ClearError();
+						camera.reset();
+						state.reset();
+					}
+				}
+			}
+			else if (!strcasecmp(token, "b") || !strcasecmp(token, "bias")) {// 尝试拍摄本底
+				if (!camera.unique() || !camera->IsConnected())
+					PrintXY(1, LINE_ERROR, "camera is off-line");
+				else if (state.mode != MODE_INIT)
+					PrintXY(1, LINE_ERROR, "camera being in exposure");
+				else {
+					int count = -1;
+					if ((token = strtok(NULL, seps)) != NULL) count = atoi(token);
+					state.mode = MODE_MANUAL;
+					state.set_exposure(IMGTYPE_BIAS, count);
+					PrintManualParameter();
+					ClearError();
+					if (!camera->Expose(state.expdur, false)) {
+						PrintXY(1, LINE_ERROR, "%s", camera->GetCameraInfo()->errmsg.c_str());
+						state.mode = MODE_INIT;
+					}
+				}
+			}
+			else if (!strcasecmp(token, "d") || !strcasecmp(token, "dark")) {// 尝试拍摄暗场
+				if (!camera.unique() || !camera->IsConnected())
+					PrintXY(1, LINE_ERROR, "camera is off-line");
+				else if (state.mode != MODE_INIT)
+					PrintXY(1, LINE_ERROR, "camera being in exposure");
+				else {
+					int count = -1;
+					double expdur = -1.0;
+					if ((token = strtok(NULL, seps)) != NULL) expdur = atof(token);
+					if ((token = strtok(NULL, seps)) != NULL) count = atoi(token);
+					state.mode = MODE_MANUAL;
+					state.set_exposure(IMGTYPE_DARK, count, expdur);
+					PrintManualParameter();
+					ClearError();
+					if (!camera->Expose(state.expdur, false)) {
+						PrintXY(1, LINE_ERROR, "%s", camera->GetCameraInfo()->errmsg.c_str());
+						state.mode = MODE_INIT;
+					}
+				}
+			}
+			else if (!strcasecmp(token, "f") || !strcasecmp(token, "focus")) {// 检查或改变调焦器位置
+				if (!focus.tcp.use_count())
+					PrintXY(1, LINE_ERROR, "focuser is off-line");
+				else if (state.mode != MODE_INIT)
+					PrintXY(1, LINE_ERROR, "camera being in exposure");
+				else if (state.cid.empty())
+					PrintXY(1, LINE_ERROR, "camera_id is empty, camera is required to be on-line");
+				else if ((token = strtok(NULL, seps)) != NULL) {
+					if (focus.posTar == VALID_FOCUS)
+						set_focus_target(atoi(token));
+					else
+						set_focus_target(atoi(token) + focus.posTar);
+					ClearError();
+				}
+			}
+			else if (!strcasecmp(token, "r") || !strcasecmp(token, "reload")) {// 尝试重新加载配置参数
+				if (state.mode != MODE_INIT) PrintXY(1, LINE_ERROR, "camera being in AUTO mode");
+				else {
+					param.LoadFile(gConfigPath);
+					PrintAutoParameter();
+					ClearError();
+				}
+			}
+			else if (!strcasecmp(token, "start")) {// 尝试启动观测流程
+				if (!focus.tcp.use_count())
+					PrintXY(1, LINE_ERROR, "focuser is off-line");
+				else if (!camera.unique() || !camera->IsConnected())
+					PrintXY(1, LINE_ERROR, "camera is off-line");
+				else if (state.mode != MODE_INIT)
+					PrintXY(1, LINE_ERROR, "camera being in exposure");
+				else {
+					PrintAutoParameter();
+					ClearError();
+					state.mode = MODE_AUTO;
+					state.set_exposure(IMGTYPE_OBJECT, param.frmcnt, param.expdur, "auto");
+					if (!set_focus_target(param.stroke_start - param.stroke_back)) // 顺序执行流程. 多走一个间隔用于消齿隙
+						set_focus_target(param.stroke_start);
+				}
+			}
+			else if (!strcasecmp(token, "stop")) {// 尝试中止观测流程
+				if (state.mode != MODE_INIT) {// 中止观测流程
+					if (camera->GetCameraInfo()->exposing)
+						camera->AbortExpose();
+					state.mode = MODE_INIT;
+					ClearError();
+					PrintXY(1, LINE_STATUS, "exposure is aborted");
+				}
+				else PrintXY(1, LINE_ERROR, "system is idle");
+			}
+			else {// 尝试拍摄目标图像
+				if (!camera.unique() || !camera->IsConnected())
+					PrintXY(1, LINE_ERROR, "camera is off-line");
+				else if (state.mode != MODE_INIT)
+					PrintXY(1, LINE_ERROR, "camera being in exposure");
+				else {
+					std::string name = token;
+					int count(-1);
+					double expdur(-1.0);
+					if ((token = strtok(NULL, seps)) != NULL)
+						expdur = atof(token);
+					if ((token = strtok(NULL, seps)) != NULL)
+						count = atoi(token);
+					state.mode = MODE_MANUAL;
+					state.set_exposure(IMGTYPE_OBJECT, count, expdur, name);
+					PrintManualParameter();
+					ClearError();
+					if (!camera->Expose(state.expdur, true)) {
+						PrintXY(1, LINE_ERROR, "%s", camera->GetCameraInfo()->errmsg.c_str());
+						state.mode = MODE_INIT;
+					}
+				}
+			}
+
+			PrintInput();
+		}
+	}
+
+	StopMessageQueue();
+	tcpsfoc.reset();
+	if (camera.unique() && camera->IsConnected()) camera->Disconnect();
+	if (ftcli.unique()) ftcli->Stop();
+
+	return 0;
+}
+
 int main(int argc, char** argv) {
+	int rslt(0);
+
 	if (argc >= 2) {// 处理命令行参数
 		if (strcmp(argv[1], "-d") == 0) {
 			param.InitFile(gConfigPath);
@@ -696,208 +938,8 @@ int main(int argc, char** argv) {
 		}
 	}
 	else {// 常规工作模式
-		bool bcont(true);
-		char input[100], command[100], ch;
-		char *token;
-		char seps[] = " ,;\t";
-		int pos(0), n;
-
-		param.LoadFile(gConfigPath);
-//////////////////////////////////////////////////////////////////////////////
-// 准备工作环境
-		if (!StartServerFocus()) {
-			gLog1.Write(LOG_FAULT, "", "Failed to create TCP server for focuser");
-			return -1;
-		}
-
-		if (!StartMessageQueue()) {
-			gLog1.Write(LOG_FAULT, "", "Failed to create message queue");
-			return -2;
-		}
-		mntproto = boost::make_shared<mount_proto>();
-//////////////////////////////////////////////////////////////////////////////
-		if (param.display) system("ds9&");
-
-		ClearScreen();
-		PrintHelp();
-		PrintServer();
-		PrintAutoParameter();
-		PrintInput();
-
-		while (bcont) {
-			if ((ch = getchar()) != '\r' && ch !='\n') {
-				input[pos++] = (char) ch;
-				mutex_lock lck(mtxcur);
-				++curpos;
-			}
-			else if (pos) {
-				input[pos] = 0;
-				pos = 0;
-				strcpy(command, input);
-				token = strtok(command, seps); // 第一个token为关键字或者其它...
-
-				if (strcmp(input, "Q") == 0 || strcasecmp(input, "quit") == 0) bcont = false;
-				else {
-					if (!strcasecmp(token, "on")) {// 尝试连接相机
-						if (camera.unique() && camera->IsConnected())
-							PrintXY(1, LINE_ERROR, "camera had connected");
-						else {// 依据参数选择待连接相机
-							std::string camid; // 相机标志
-							boost::format fmt("%03d");
-							int cid;
-
-							if ((token = strtok(NULL, seps)) == NULL || atoi(token) == 5) {// U9000
-								fmt % (atoi(param.unitid.c_str()) * 10 + 5); // 相机编号编码格式1
-								state.cid = fmt.str();
-								state.termtype = "FFoV";
-//								boost::shared_ptr<CameraApogee> ccd = boost::make_shared<CameraApogee>();
-//								camera = boost::static_pointer_cast<CameraBase>(ccd);
-							}
-							else {// GWAC GY
-								using boost::asio::ip::address_v4;
-								std::string camip = token;
-								address_v4 addr = address_v4::from_string(camip.c_str());
-								fmt % (addr.to_ulong() % 256);
-								state.cid = fmt.str();
-								state.termtype = "JFoV";
-								boost::shared_ptr<CameraGY> ccd = boost::make_shared<CameraGY>(camip);
-								camera = boost::static_pointer_cast<CameraGY>(ccd);
-							}
-							if (!camera->Connect()) {
-								PrintXY(1, LINE_ERROR, "failed to connect camera: %s", camera->GetCameraInfo()->errmsg.c_str());
-								camera.reset();
-								state.reset();
-							}
-							else {
-								PrintXY(1, LINE_STATUS, "camera<%s> connected", state.cid.c_str());
-								ClearError();
-								const ExposeProcess::slot_type& slot = boost::bind(&ExposeProcessCB, _1, _2, _3);
-								camera->register_expose(slot);
-							}
-						}
-					}
-					else if (!strcasecmp(token, "off")) {// 尝试断开相机
-						if (!camera.unique() || !camera->IsConnected())
-							PrintXY(1, LINE_ERROR, "camera is off-line");
-						else if (state.mode != MODE_INIT)
-							PrintXY(1, LINE_ERROR, "camera being in exposure");
-						else {
-							camera->Disconnect();
-							if (camera->IsConnected())
-								PrintXY(1, LINE_ERROR, "failed to disconnect camera");
-							else {
-								PrintXY(1, LINE_STATUS, "camera disconnected");
-								ClearError();
-								camera.reset();
-								state.reset();
-							}
-						}
-					}
-					else if (!strcasecmp(token, "b") || !strcasecmp(token, "bias")) {// 尝试拍摄本底
-						if (!camera.unique() || !camera->IsConnected())
-							PrintXY(1, LINE_ERROR, "camera is off-line");
-						else if (state.mode != MODE_INIT)
-							PrintXY(1, LINE_ERROR, "camera being in exposure");
-						else {
-							int count = -1;
-							if ((token = strtok(NULL, seps)) != NULL) count = atoi(token);
-							state.mode = MODE_MANUAL;
-							state.set_exposure(IMGTYPE_BIAS, count);
-							PrintManualParameter();
-							ClearError();
-							if (!camera->Expose(state.expdur, false)) {
-								PrintXY(1, LINE_ERROR, "%s", camera->GetCameraInfo()->errmsg.c_str());
-								state.mode = MODE_INIT;
-							}
-						}
-					}
-					else if (!strcasecmp(token, "d") || !strcasecmp(token, "dark")) {// 尝试拍摄暗场
-						if (!camera.unique() || !camera->IsConnected())
-							PrintXY(1, LINE_ERROR, "camera is off-line");
-						else if (state.mode != MODE_INIT)
-							PrintXY(1, LINE_ERROR, "camera being in exposure");
-						else {
-							int count = -1;
-							double expdur = -1.0;
-							if ((token = strtok(NULL, seps)) != NULL) expdur = atof(token);
-							if ((token = strtok(NULL, seps)) != NULL) count = atoi(token);
-							state.mode = MODE_MANUAL;
-							state.set_exposure(IMGTYPE_DARK, count, expdur);
-							PrintManualParameter();
-							ClearError();
-							if (!camera->Expose(state.expdur, false)) {
-								PrintXY(1, LINE_ERROR, "%s", camera->GetCameraInfo()->errmsg.c_str());
-								state.mode = MODE_INIT;
-							}
-						}
-					}
-					else if (!strcasecmp(token, "f") || !strcasecmp(token, "focus")) {// 检查或改变调焦器位置
-						if (!focus.tcp.use_count()) PrintXY(1, LINE_ERROR, "focuser is off-line");
-						else if (state.mode != MODE_INIT) PrintXY(1, LINE_ERROR, "camera being in exposure");
-						else if (state.cid.empty()) PrintXY(1, LINE_ERROR, "camera_id is empty, camera is required to be on-line");
-						else if ((token = strtok(NULL, seps)) != NULL) {
-							set_focus_target(atoi(token));
-							ClearError();
-						}
-					}
-					else if (!strcasecmp(token, "r") || !strcasecmp(token, "reload")) {// 尝试重新加载配置参数
-						if (state.mode != MODE_INIT) PrintXY(1, LINE_ERROR, "camera being in AUTO mode");
-						else {
-							param.LoadFile(gConfigPath);
-							PrintAutoParameter();
-							ClearError();
-						}
-					}
-					else if (!strcasecmp(token, "start")) {// 尝试启动观测流程
-						if (!focus.tcp.use_count()) PrintXY(1, LINE_ERROR, "focuser is off-line");
-						else if (!camera.unique() || !camera->IsConnected()) PrintXY(1, LINE_ERROR, "camera is off-line");
-						else if (state.mode != MODE_INIT) PrintXY(1, LINE_ERROR, "camera being in exposure");
-						else {
-							PrintAutoParameter();
-							ClearError();
-							state.mode = MODE_AUTO;
-							state.set_exposure(IMGTYPE_OBJECT, param.frmcnt, param.expdur, "auto");
-							if (!set_focus_target(param.stroke_start - param.stroke_step)) // 顺序执行流程. 多走一个间隔用于消齿隙
-								set_focus_target(param.stroke_start);
-						}
-					}
-					else if (!strcasecmp(token, "stop")) {// 尝试中止观测流程
-						if (state.mode != MODE_INIT) {// 中止观测流程
-							if (camera->GetCameraInfo()->exposing) camera->AbortExpose();
-							state.mode = MODE_INIT;
-							ClearError();
-							PrintXY(1, LINE_STATUS, "exposure is aborted");
-						}
-						else PrintXY(1, LINE_ERROR, "system is idle");
-					}
-					else {// 尝试拍摄目标图像
-						if (!camera.unique() || !camera->IsConnected()) PrintXY(1, LINE_ERROR, "camera is off-line");
-						else if (state.mode != MODE_INIT) PrintXY(1, LINE_ERROR, "camera being in exposure");
-						else {
-							std::string name = token;
-							int count(-1);
-							double expdur(-1.0);
-							if ((token = strtok(NULL, seps)) != NULL) expdur = atof(token);
-							if ((token = strtok(NULL, seps)) != NULL) count = atoi(token);
-							state.mode = MODE_MANUAL;
-							state.set_exposure(IMGTYPE_OBJECT, count, expdur, name);
-							PrintManualParameter();
-							ClearError();
-							if (!camera->Expose(state.expdur, true)) {
-								PrintXY(1, LINE_ERROR, "%s", camera->GetCameraInfo()->errmsg.c_str());
-								state.mode = MODE_INIT;
-							}
-						}
-					}
-
-					PrintInput();
-				}
-			}
-		}
+		rslt = MainBody();
 	}
 
-	StopMessageQueue();
-	if (camera.unique() && camera->IsConnected()) camera->Disconnect();
-
-	return 0;
+	return rslt;
 }

@@ -24,9 +24,13 @@ struct param_config {// 软件配置参数
 	int stroke_start;	//< 行程起点, 量纲: 微米
 	int stroke_stop;	//< 行程终点, 量纲: 微米
 	int stroke_step;	//< 行程步长, 量纲: 微米
+	int stroke_back;//< 行程回差, 量纲: 微米
 	int focuser_error;	//< 调焦器定位误差, 量纲: 微米
 	double expdur;		//< 曝光时间, 量纲: 秒
 	int frmcnt;			//< 曝光帧数
+	bool bfts;			//< 启用文件服务器
+	std::string ipfts;	//< 文件服务器IP地址
+	int portfts;			//< 文件服务器端口
 	bool display;		//< 是否实时显示图像
 	std::string pathroot;//< 文件存储根路径
 
@@ -42,9 +46,13 @@ public:
 		pt.add("stroke.<xmlattr>.start", stroke_start = -100);
 		pt.add("stroke.<xmlattr>.stop",  stroke_stop = 100);
 		pt.add("stroke.<xmlattr>.step",  stroke_step = 10);
+		pt.add("stroke.<xmlattr>.backlash",  stroke_back = 50);
 		pt.add("stroke.<xmlattr>.error", focuser_error = 2);
 		pt.add("exposure.<xmlattr>.duration", expdur = 5);
 		pt.add("exposure.<xmlattr>.count", frmcnt = 1);
+		pt.add("FileServer.<xmlattr>.Enable", bfts = false);
+		pt.add("FileServer.<xmlattr>.IP", ipfts = "127.0.0.1");
+		pt.add("FileServer.<xmlattr>.Port", portfts = 4020);
 		pt.add("display", display = false);
 		pt.add("PathRoot", pathroot = "/data");
 
@@ -65,9 +73,13 @@ public:
 		stroke_start = pt.get("stroke.<xmlattr>.start", -100);;
 		stroke_stop = pt.get("stroke.<xmlattr>.stop",  100);
 		stroke_step = pt.get("stroke.<xmlattr>.step",  10);
+		stroke_back = pt.get("stroke.<xmlattr>.backlash", 50);
 		focuser_error = pt.get("stroke.<xmlattr>.error", 2);
 		expdur = pt.get("exposure.<xmlattr>.duration", 2);
 		frmcnt = pt.get("exposure.<xmlattr>.count", 3);
+		bfts   = pt.get("FileServer.<xmlattr>.Enable", false);
+		ipfts  = pt.get("FileServer.<xmlattr>.IP", "127.0.0.1");
+		portfts  = pt.get("FileServer.<xmlattr>.Port", 4020);
 		display = pt.get("display", false);
 		pathroot= pt.get("PathRoot", "/data");
 		boost::trim_right_if(pathroot, boost::is_punct() || boost::is_space());
@@ -77,6 +89,9 @@ public:
 		if ((stroke_start > stroke_stop && stroke_step > 0)
 				|| (stroke_start < stroke_stop && stroke_step < 0))
 			stroke_step *= -1;
+		if ((stroke_start > stroke_stop && stroke_back > 0)
+				|| (stroke_start < stroke_stop && stroke_back < 0))
+			stroke_back *= -1;
 		if (expdur <= 1E-6) expdur = 2.0;
 		if (frmcnt <= 0) frmcnt = 1;
 	}
