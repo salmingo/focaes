@@ -21,6 +21,7 @@
 #include <boost/interprocess/ipc/message_queue.hpp>
 #include <longnam.h>
 #include <fitsio.h>
+#include <xpa.h>
 
 //////////////////////////////////////////////////////////////////////////////
 #define VALID_FOCUS 10000
@@ -134,6 +135,7 @@ int curpos;		//< 光标位置
 boost::mutex mtxcur;	//< 光标互斥区
 static char flags[] = "|/-\\";
 static int iflag(-1);
+bool firstimg(true);
 
 //////////////////////////////////////////////////////////////////////////////
 /// 全局函数
@@ -233,6 +235,74 @@ void PrintExprocess(double process) {
 	UpdateScreen();
 }
 /*==========================================================================*/
+/* 显示FITS图像 */
+bool XPASetFile(const char *filepath, const char *filename, bool back) {
+	char *names, *messages;
+	char params[100];
+	char mode[50];
+
+	strcpy(mode, back ? "ack=true" : "ack=false");
+	sprintf(params, "fits %s", filename);
+	int fd = open(filepath, O_RDONLY);
+	if (fd >= 0) {
+		XPASetFd(NULL, (char*) "ds9", params, mode, fd, &names, &messages, 1);
+		if (names) free(names);
+		if (messages) free(messages);
+		close(fd);
+		return true;
+	}
+	return false;
+}
+
+void XPASetScaleMode(const char *mode) {
+	char *names, *messages;
+	char params[40];
+
+	sprintf(params, "scale mode %s", mode);
+	XPASet(NULL, (char*) "ds9", params, NULL, NULL, 0, &names, &messages, 1);
+	if (names) free(names);
+	if (messages) free(messages);
+}
+
+void XPASetZoom(const char *zoom) {
+	char *names, *messages;
+	char params[40];
+
+	sprintf(params, "zoom %s", zoom);
+	XPASet(NULL, (char*) "ds9", params, NULL, NULL, 0, &names, &messages, 1);
+	if (names) free(names);
+	if (messages) free(messages);
+}
+
+void XPAPreservePan(bool yes) {
+	char *names, *messages;
+	char params[40];
+
+	sprintf(params, "preserve pan %s", yes ? "yes" : "no");
+	XPASet(NULL, (char*) "ds9", params, NULL, NULL, 0, &names, &messages, 1);
+	if (names) free(names);
+	if (messages) free(messages);
+}
+
+void XPAPreserveRegion(bool yes) {
+	char *names, *messages;
+	char params[40];
+
+	sprintf(params, "preserve regions %s", yes ? "yes" : "no");
+	XPASet(NULL, (char*) "ds9", params, NULL, NULL, 0, &names, &messages, 1);
+	if (names) free(names);
+	if (messages) free(messages);
+}
+
+void DisplayImage() {// display fits image
+	if (XPASetFile(state.filepath.c_str(), state.filename.c_str(), firstimg) && firstimg) {
+		firstimg = false;
+		XPASetScaleMode("zscale");
+		XPASetZoom("to fit");
+		XPAPreservePan(true);
+		XPAPreserveRegion(true);
+	}
+}
 /*==========================================================================*/
 /*!
  * @brief 设置焦点目标位置
@@ -485,7 +555,8 @@ bool SaveFITSFile() {
 void ExposeComplete() {
 	++state.frmno;
 	SaveFITSFile();
-	//...显示图像?
+	if (param.display) DisplayImage();
+
 	PrintXY(1, LINE_STATUS, "file<%d/%d>: \033[93;49m\033[1m%s\033[0m",
 			state.frmno, state.frmcnt,
 			state.filepath.c_str());
@@ -645,6 +716,7 @@ int main(int argc, char** argv) {
 		}
 		mntproto = boost::make_shared<mount_proto>();
 //////////////////////////////////////////////////////////////////////////////
+		if (param.display) system("ds9&");
 
 		ClearScreen();
 		PrintHelp();

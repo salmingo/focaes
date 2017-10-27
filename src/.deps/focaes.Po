@@ -1970,7 +1970,8 @@ focaes.o: focaes.cpp globaldef.h GLog.h \
   /usr/local/include/boost/interprocess/detail/simple_swap.hpp \
   /usr/local/include/boost/interprocess/offset_ptr.hpp \
   /usr/local/include/boost/interprocess/detail/cast_tags.hpp CameraGY.h \
-  udp_asio.h /usr/local/include/longnam.h /usr/local/include/fitsio.h
+  udp_asio.h /usr/local/include/longnam.h /usr/local/include/fitsio.h \
+  /usr/local/include/xpa.h /usr/local/include/prsetup.h
 
 globaldef.h:
 
@@ -6163,3 +6164,7 @@ udp_asio.h:
 /usr/local/include/longnam.h:
 
 /usr/local/include/fitsio.h:
+
+/usr/local/include/xpa.h:
+
+/usr/local/include/prsetup.h:
