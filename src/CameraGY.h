@@ -16,11 +16,6 @@
  *   程序卡死. 采用异步函数和延时判断(500ms)机制, 判定相机的可访问性
  * - 未实现增益与快门寄存器读取功能. 待实现
  * - 未实现0xF0F00830地址写入功能. 不再使用
-0x00020050 曝光终止 WO
-最低位为0，终止曝光后，将已曝光图像读出；
-最低位为1，终止曝光后，将已曝光图像丢弃；
-0x00020054 设备重启 WO
-参数必须=0x12AB3C4D
  */
 
 #ifndef CAMERAGY_H_
@@ -221,12 +216,6 @@ private:
 	 * @param len 收到的数据长度, 量纲: 字节
 	 */
 	void ReceiveDataCB(const long udp, const long len);
-	/*!
-	 * @brief 回调函数, 处理相机发送的UDP指令信息
-	 * @param udp udp_session实例指针
-	 * @param len 收到的数据长度, 量纲: 字节
-	 */
-	void ReceiveCommandCB(const long udp, const long len);
 
 private:
 	/* 成员变量 */
@@ -242,7 +231,6 @@ private:
 	 * - 通过UDP<IP_CAMERA, PORT_CAMERA>发送控制指令, 接收指令反馈
 	 */
 	udpptr udpcmd_;			//< 与相机间UDP指令接口
-	int64_t tmcmd_;			//< 指令时间戳
 	uint16_t msgcnt_;		//< 指令帧序列编号
 	boost::mutex mtxReg_;	//< 相机寄存器互斥锁
 	threadptr thHB_;		//< 心跳线程
@@ -268,6 +256,7 @@ private:
 	uint16_t idFrame_;	//< 图像帧编号
 	uint32_t idPack_;	//< 一帧图像中的包编号
 	boost::condition_variable imgrdy_;	//< 等待完成图像读出
+	int nfail_;	//< 心跳连续错误计数
 };
 
 #endif /* CAMERAGY_H_ */

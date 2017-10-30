@@ -152,6 +152,7 @@ void PrintHelp() {
 	int x(1), y(LINE_SEPARATOR - 1);
 	std::string seps = std::string(86, '*');
 
+	ShowCursor(false);
 	PrintXY(x, ++y, "\033[92;49m%s\033[0m", seps.c_str());
 	PrintXY(x, ++y, "* On <Camera_IP>            # connect camera. empty for U9000.       keyword: \033[93;49m\033[1mon\033[0m     *");
 	PrintXY(x, ++y, "* Off                       # disconnect camera.                     keyword: \033[93;49m\033[1moff\033[0m    *");
@@ -167,6 +168,7 @@ void PrintHelp() {
 }
 
 void PrintServer() {// 显示调焦器网络服务端口
+	ShowCursor(false);
 	PrintXY(1, LINE_PORT, "Focus Daemon Port: %d", param.portFocus);
 }
 
@@ -174,10 +176,12 @@ void PrintInput() {// 显示用户输入提示符
 	mutex_lock lck(mtxcur);
 	curpos = 3;
 	PrintXY(1, LINE_INPUT, "\033[93;49m\033[1m>\033[0m\033[0m ");
+	ShowCursor(true);
 	UpdateScreen();
 }
 
 void PrintAutoParameter() {// 显示自动控制参数
+	ShowCursor(false);
 	PrintXY(1, LINE_PARAM, "group=%s, unit=%s, expdur=%.3f, count=%d, focuser<from %d to %d, step=%d, error=%d>",
 			param.grpid.c_str(), param.unitid.c_str(),
 			param.expdur, param.frmcnt,
@@ -185,6 +189,7 @@ void PrintAutoParameter() {// 显示自动控制参数
 }
 
 void PrintManualParameter() {// 显示手动控制参数
+	ShowCursor(false);
 	PrintXY(1, LINE_PARAM, "ImageType=%s, name=%s, expdur=%.3f, frmcnt=%d",
 			state.imgtype == IMGTYPE_BIAS ? "BIAS" : (state.imgtype == IMGTYPE_DARK ? "DARK" : "OBJECT"),
 					state.objname.c_str(), state.expdur, state.frmcnt);
@@ -198,10 +203,13 @@ void PrintFocus() {// 显示焦点位置
 		n = sprintf(buff, "focuser:");
 		if (act != VALID_FOCUS) n += sprintf(buff + n, "  position=%d", act);
 		if (tar != VALID_FOCUS) sprintf(buff + n, "  target=%d", tar);
-		PrintXY(1, LINE_FOCUS, "%s", buff);
 
+		ShowCursor(false);
+		PrintXY(1, LINE_FOCUS, "%s", buff);
 		mutex_lock lck(mtxcur);
 		MovetoXY(curpos, LINE_INPUT);
+		ShowCursor(true);
+		UpdateScreen();
 	}
 }
 
@@ -230,10 +238,12 @@ void PrintExprocess(double process) {
 		txt[n++] = flags[iflag];
 	}
 	sprintf(txt + 85, " %5.1f%%", process * 100.000001);
-	PrintXY(1, LINE_EXPROCESS, "%s", txt);
 
+	ShowCursor(false);
+	PrintXY(1, LINE_EXPROCESS, "%s", txt);
 	mutex_lock lck(mtxcur);
 	MovetoXY(curpos, LINE_INPUT);
+	ShowCursor(true);
 	UpdateScreen();
 }
 /*==========================================================================*/
@@ -348,7 +358,6 @@ bool set_focus_real(int act) {
 	if (!rslt) {
 		focus.posAct = act;
 		PrintFocus();
-		UpdateScreen();
 	}
 	return rslt;
 }
@@ -563,6 +572,7 @@ bool SaveFITSFile() {
  * @brief 曝光正确结束
  */
 void ExposeComplete() {
+	ShowCursor(false);
 	++state.frmno;
 	SaveFITSFile();
 	if (param.bfts && ftcli.unique() && state.mode == MODE_AUTO) UploadFile();
@@ -574,7 +584,12 @@ void ExposeComplete() {
 	PrintXY(1, LINE_EXPROCESS, "");
 
 	if (state.frmno < state.frmcnt) {// 继续曝光
-		camera->Expose(state.expdur, state.imgtype == IMGTYPE_OBJECT);
+		if (state.mode != MODE_INIT)
+			camera->Expose(state.expdur, state.imgtype == IMGTYPE_OBJECT);
+		else {
+			ClearError();
+			PrintXY(1, LINE_STATUS, "exposure is aborted");
+		}
 	}
 	else if (state.mode != MODE_AUTO) {
 		state.mode = MODE_INIT;
@@ -594,6 +609,7 @@ void ExposeComplete() {
 
 	mutex_lock lck(mtxcur);
 	MovetoXY(curpos, LINE_INPUT);
+	ShowCursor(true);
 	UpdateScreen();
 }
 
@@ -602,10 +618,13 @@ void ExposeComplete() {
  */
 void ExposeFail() {
 	state.mode = MODE_INIT;
-	PrintXY(1, LINE_ERROR, "exposure fail");
+	ShowCursor(false);
+	PrintXY(1, LINE_ERROR, "exposure fail. %s",
+			camera->GetCameraInfo()->errmsg.c_str());
 
 	mutex_lock lck(mtxcur);
 	MovetoXY(curpos, LINE_INPUT);
+	ShowCursor(true);
 	UpdateScreen();
 }
 
@@ -638,6 +657,7 @@ void ThreadMessageQueue() {
 			break;
 		case 2:// 调焦远程主机断开网络连接
 			focus.tcp.reset();
+			ShowCursor(false);
 			if (state.mode == MODE_AUTO) {
 				PrintXY(1, LINE_ERROR, "stroke sequence will be interrupted after this position over");
 				state.mode = MODE_MANUAL;
@@ -646,6 +666,7 @@ void ThreadMessageQueue() {
 			{
 				mutex_lock lck(mtxcur);
 				MovetoXY(curpos, LINE_INPUT);
+				ShowCursor(true);
 				UpdateScreen();
 			}
 			break;

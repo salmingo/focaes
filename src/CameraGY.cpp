@@ -20,7 +20,6 @@ CameraGY::CameraGY(const std::string& camIP) {
 	shtrmode_	= UINT_MAX;
 	gain_		= UINT_MAX;
 	msgcnt_		= 0;
-	tmcmd_		= -100000;
 	tmdata_		= -100000;
 	state_		= -1;
 	aborted_	= false;
@@ -33,9 +32,7 @@ CameraGY::CameraGY(const std::string& camIP) {
 	udpdata_ = boost::make_shared<udp_session>(PORT_LOCAL, true);
 	udpdata_->register_receive(slot1);
 	// 初始化指令传输接口
-	const udp_session::slottype &slot2 = boost::bind(&CameraGY::ReceiveCommandCB, this, _1, _2);
 	udpcmd_ = boost::make_shared<udp_session>();
-	udpcmd_->register_receive(slot2);
 	udpcmd_->set_peer(camIP.c_str(), PORT_CAMERA);
 }
 
@@ -89,6 +86,7 @@ bool CameraGY::OpenCamera() {
 		Read(0x0002000C, shtrmode_);
 		Read(0x00020010, expdur_);
 		// 启动心跳机制, 维护与相机间的网络连接
+		nfail_ = 0;
 		thHB_.reset(new boost::thread(boost::bind(&CameraGY::ThreadHB, this)));
 
 		return true;
@@ -128,7 +126,7 @@ void CameraGY::UpdateReadRate(uint32_t& index) {
 
 // 设置增益
 void CameraGY::UpdateGain(uint32_t& index) {
-	if (index <= 2 && index != gain_) {
+	if (0 <= index && index <= 2 && index != gain_) {
 		try {
 			Write(0x00020008, index);
 			Read(0x00020008, index);
@@ -167,11 +165,13 @@ bool CameraGY::StartExpose(double duration, bool light) {
 		// 设置曝光参数
 		uint32_t val;
 		if (shtrmode_ != (val = light ? 0 : 2) && Write(0x0002000C, val)) {
-			Read(0x0002000C, shtrmode_);
+			if (!Read(0x0002000C, shtrmode_))
+				throw std::runtime_error("failed to read shutter-mode");
 			boost::this_thread::sleep_for(boost::chrono::milliseconds(100));
 		}
 		if (expdur_ != (val = uint32_t(duration * 1E6)) && Write(0x00020010, val)) {
-			Read(0x00020010, expdur_);
+			if (!Read(0x00020010, expdur_))
+				throw std::runtime_error("failed to read exposure-duration");
 		}
 		Write(0x00020000, 0x01);
 		state_ = 1;
@@ -187,9 +187,9 @@ bool CameraGY::StartExpose(double duration, bool light) {
 // 中止当前曝光过程
 void CameraGY::StopExpose() {
 	try {
-		aborted_ = true;
 		Write(0x20050, 0x1);
-		state_ = 0;	// 中断且抛弃已累积数据
+		aborted_ = true;
+//		state_ = 0;	// 中断且抛弃已累积数据
 	}
 	catch(std::runtime_error& ex) {
 		nfcam_->errmsg = ex.what();
@@ -234,13 +234,9 @@ bool CameraGY::Write(uint32_t addr, uint32_t val) {
 	// 2017-10-21: 输出收到的信息
 	if (n != 12 || buff2[11] != 0x01) {
 		char txt[200];
-		int n1 = sprintf(txt, "length<%d> if write register<%0X>: ", n, addr);
+		int n1 = sprintf(txt, "length<%d> of write register<%0X>: ", n, addr);
 		for (int i = 0; i < n; ++i) n1 += sprintf(txt + n1, "%02X ", buff2[i]);
 		throw std::runtime_error(txt);
-// before 2017-10-21
-//		boost::format fmt("Failed to write register<%0X>, length = %d");
-//		fmt % addr % n;
-//		throw std::runtime_error(fmt.str());
 	}
 	return buff2[11] == 0x01;
 }
@@ -260,10 +256,6 @@ bool CameraGY::Read(uint32_t addr, uint32_t &val) {
 		int n1 = sprintf(txt, "length<%d> of read register<%0X>: ", n, addr);
 		for (int i = 0; i < n; ++i) n1 += sprintf(txt + n1, "%02X ", buff2[i]);
 		throw std::runtime_error(txt);
-// before 2017-10-21
-//		boost::format fmt("Failed to read register<%0X>");
-//		fmt % addr;
-//		throw std::runtime_error(fmt.str());
 	}
 	else val = ntohl(((uint32_t*)buff2)[2]);
 	return n == 12;
@@ -279,8 +271,9 @@ void CameraGY::Retransmit() {
 		 * - 终止读出过程
 		 * - 终止程序, 需要用户干预检查网络状态或相机状态
 		 */
-		if (!aborted_) imgrdy_.notify_one();
-		else state_ = -1;
+//		if (!aborted_) imgrdy_.notify_one();
+//		else state_ = -1;
+		imgrdy_.notify_one();
 	}
 	else {
 		pck0 = i;
@@ -291,21 +284,15 @@ void CameraGY::Retransmit() {
 }
 
 bool CameraGY::Retransmit(uint32_t iPack0, uint32_t iPack1) {
-	try {
-		mutex_lock lck(mtxReg_);
-	    boost::array<uint8_t, 20> buff = {0x42, 0x00, 0x00, 0x40, 0x00, 0x0c};
-	    ((uint16_t*)&buff)[3] = htons(++msgcnt_);
-	    ((uint32_t*)&buff)[2] = htonl(idFrame_);
-	    ((uint32_t*)&buff)[3] = htonl(iPack0);
-	    ((uint32_t*)&buff)[4] = htonl(iPack1);
-	    udpcmd_->write(buff.c_array(), buff.size());
+	mutex_lock lck(mtxReg_);
+	boost::array<uint8_t, 20> buff = {0x42, 0x00, 0x00, 0x40, 0x00, 0x0c};
+	((uint16_t*)&buff)[3] = htons(++msgcnt_);
+	((uint32_t*)&buff)[2] = htonl(idFrame_);
+	((uint32_t*)&buff)[3] = htonl(iPack0);
+	((uint32_t*)&buff)[4] = htonl(iPack1);
+	udpcmd_->write(buff.c_array(), buff.size());
 
-		return true;
-	}
-	catch(std::runtime_error &ex) {
-		nfcam_->errmsg = ex.what();
-		return false;
-	}
+	return true;
 }
 
 uint32_t CameraGY::GetHostAddr() {
@@ -369,22 +356,28 @@ void CameraGY::ThreadHB() {
 		boost::this_thread::sleep_for(p);
 		try {
 			Write(0x0938, 0x2EE0);
+			if (nfail_) nfail_ = 0;
 		}
 		catch(std::runtime_error& ex) {
+			++nfail_;
 			nfcam_->errmsg = ex.what();
 		}
 
-		if (nfcam_->exposing) {
+		if (nfail_ < 5 && nfcam_->exposing) {
 			now = microsec_clock::universal_time();
 			td = now - nfcam_->tmobs;
 
 			if ((td.total_seconds() - nfcam_->eduration) > 10.0) {
 				StopExpose();
+				imgrdy_.notify_one();
 			}
 			else if (idFrame_ != 0xFFFF && bytercd_ < byteimg_) {
 				dt = now.time_of_day().total_milliseconds() - tmdata_;
 				if (dt > busy_t1 || dt < busy_t2) Retransmit();
 			}
+		}
+		else if (nfail_ >= 5) {
+			//...
 		}
 	}
 }
@@ -428,15 +421,12 @@ void CameraGY::ReceiveDataCB(const long udp, const long len) {
 		}
 	}
 	else if (type == ID_TRAILER) {
-		/*
-		 * - 数据不全但收到trailer, 中间必然有丢包
-		 * - idPack_ == packtot_
-		 */
-		idPack_  = idPack;
-		Retransmit();
+		if (aborted_) {// 中止时收到包尾, 通知完成数据接收
+			imgrdy_.notify_one();
+		}
+		else {// 数据不全但收到trailer, 中间必然丢包, 申请重传
+			idPack_  = idPack;
+			Retransmit();
+		}
 	}
-}
-
-void CameraGY::ReceiveCommandCB(const long udp, const long len) {
-	UpdateTimeFlag(tmcmd_);
 }

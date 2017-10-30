@@ -19,6 +19,7 @@
 
 using namespace boost::posix_time;
 using boost::asio::ip::tcp;
+using std::string;
 
 class FileTransferClient {
 public:
@@ -27,12 +28,12 @@ public:
 
 public:
 	struct upload_file {// 待上传文件描述特着
-		std::string grid_id;		//< 天区划分模式
-		std::string field_id;	//< 天区编号
-		std::string timeobs;		//< 起始曝光时间, 格式: CCYY-MM-DDThh:mm:ss.ssssss
-		std::string filepath;	//< 文件本地全路径
-		std::string subpath;		//< 子目录名
-		std::string filename;	//< 文件名
+		string grid_id;		//< 天区划分模式
+		string field_id;	//< 天区编号
+		string timeobs;		//< 起始曝光时间, 格式: CCYY-MM-DDThh:mm:ss.ssssss
+		string filepath;	//< 文件本地全路径
+		string subpath;		//< 子目录名
+		string filename;	//< 文件名
 
 	public:
 		upload_file& operator=(const upload_file& other) {
