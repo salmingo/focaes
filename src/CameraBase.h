@@ -22,6 +22,26 @@
 
 using namespace boost::posix_time;
 
+enum CAMERA_STATUS {// 相机工作状态
+	CAMERA_ERROR,	// 错误
+	CAMERA_IDLE,	// 空闲
+	CAMERA_EXPOSE,	// 曝光过程中
+	CAMERA_IMGRDY,	// 已完成曝光, 可以读出数据进入内存
+	CAMERA_LAST		// 占位
+};
+
+enum CAMCTL_STATUS {// 相机控制状态
+	CAMCTL_ERROR,		// 错误
+	CAMCTL_IDLE,		// 空闲
+	CAMCTL_EXPOSE,		// 曝光过程中
+	CAMCTL_COMPLETE,	// 已完成曝光
+	CAMCTL_ABORT,		// 已中止曝光
+	CAMCTL_PAUSE,		// 已暂停曝光
+	CAMCTL_WAIT_TIME,	// 等待曝光流传起始时间到达
+	CAMCTL_WAIT_FLAT,	// 平场间等待--等待转台重新指向
+	CAMCTL_LAST			// 占位
+};
+
 struct ROI {// ROI区, XY坐标起始点为(1,1)
 	int xstart, ystart;		// ROI区左上角在全幅中的位置
 	int width, height;		// ROI区在全副中的宽度和高度
@@ -49,7 +69,9 @@ struct devcam_info {// 相机设备基本信息
 	std::string model;		//< 相机型号
 	bool connected;			//< 与相机连接标志
 	bool cooling;			//< 制冷启动标志
-	bool exposing;			//< 曝光过程标志
+//	bool exposing;			//< 曝光过程标志
+	CAMERA_STATUS state;	//< 工作状态
+	int errorno;			//< 错误代码
 	int wsensor;			//< 图像宽度, 量纲: 像素
 	int hsensor;			//< 图像高度, 量纲: 像素
 	uint32_t readport;		//< 读出端口档位
@@ -77,13 +99,14 @@ public:
 	void begin_expose(double duration) {
 		tmobs = microsec_clock::universal_time();
 		eduration = duration;
-		exposing  = true;
+		state     = CAMERA_EXPOSE;
+//		exposing  = true;
 	}
 
 	void end_expose() {
 		ptime now = microsec_clock::universal_time();
 		timeend = to_simple_string(now.time_of_day());
-		exposing = false;
+//		exposing = false;
 	}
 
 	/*!
@@ -139,7 +162,7 @@ public:
  * @brief 声明曝光进度回调函数
  * @param <1> 曝光剩余时间, 量纲: 秒
  * @param <2> 曝光进度, 量纲: 百分比
- * @param <3> 图像数据状态, -1: 中止曝光, 抛弃数据; 0: 曝光中; 1: 图像已就绪, 可以存储FITS文件
+ * @param <3> 图像数据状态, CAMERA_STATUS
  */
 typedef boost::signals2::signal<void (const double, const double, const int)> ExposeProcess;
 
@@ -342,16 +365,20 @@ protected:
 	/*!
 	 * @brief 相机工作状态
 	 * @return
-	 * -1: 错误
-	 *  0: 空闲
-	 *  1: 曝光中
-	 *  2: 曝光结束
+	 * 工作状态
 	 */
-	virtual int CameraState() = 0;
+	virtual CAMERA_STATUS CameraState() = 0;
 	/*!
 	 * @brief 继承类实现真正数据读出操作
+	 * @return
+	 * 工作状态
+	 * @note
+	 * 返回值对应DownloadImage的结果, 选项为:
+	 * CAMERA_IMGRDY: 读出成功
+	 * CAMERA_IDLE:   读出失败, 源于中止曝光
+	 * CAMERA_ERROR:  相机错误
 	 */
-	virtual void DownloadImage() = 0;
+	virtual CAMERA_STATUS DownloadImage() = 0;
 };
 
 #endif /* CAMERABASE_H_ */

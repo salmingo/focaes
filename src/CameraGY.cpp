@@ -21,7 +21,7 @@ CameraGY::CameraGY(const std::string& camIP) {
 	gain_		= UINT_MAX;
 	msgcnt_		= 0;
 	tmdata_		= -100000;
-	state_		= -1;
+	state_		= CAMERA_ERROR;
 	aborted_	= false;
 	// 数据缓冲区
 	byteimg_	= 0;
@@ -71,7 +71,7 @@ bool CameraGY::OpenCamera() {
 		Write(0xA000,     0x01);		// Start AcquisitionSequence
 		// 初始化监测量
 		uint32_t val;
-		state_ = 0;
+		state_ = CAMERA_IDLE;
 		Read(0xA004, val); nfcam_->wsensor = int(val);
 		Read(0xA008, val); nfcam_->hsensor = int(val);
 		byteimg_ = nfcam_->wsensor * nfcam_->hsensor * 2;
@@ -86,7 +86,7 @@ bool CameraGY::OpenCamera() {
 		Read(0x0002000C, shtrmode_);
 		Read(0x00020010, expdur_);
 		// 启动心跳机制, 维护与相机间的网络连接
-		nfail_ = 0;
+		hbfail_ = 0;
 		thHB_.reset(new boost::thread(boost::bind(&CameraGY::ThreadHB, this)));
 
 		return true;
@@ -99,10 +99,10 @@ bool CameraGY::OpenCamera() {
 
 // 断开相机连接
 void CameraGY::CloseCamera() {
-	if (nfcam_->exposing && state_ >= 0) {// 错误时, StopExpose()无法中止曝光
+	if (state_ == CAMERA_EXPOSE) {// 错误时, StopExpose()无法中止曝光
 		boost::chrono::milliseconds t(50);
 		StopExpose();
-		while (nfcam_->exposing && state_ >= 0) boost::this_thread::sleep_for(t);
+		while (state_ == CAMERA_EXPOSE) boost::this_thread::sleep_for(t);
 	}
 	ExitThread(thHB_);
 	udpdata_->close();
@@ -156,8 +156,8 @@ double CameraGY::SensorTemperature() {
 // 启动真正曝光流程
 bool CameraGY::StartExpose(double duration, bool light) {
 	try {
-		// 设置监测量
-		if (aborted_) aborted_ = false;
+		// 设置环境参数
+		aborted_ = false;
 		bytercd_ = 0;
 		idFrame_  = uint16_t(-1);
 		idPack_   = uint32_t(-1);
@@ -174,7 +174,8 @@ bool CameraGY::StartExpose(double duration, bool light) {
 				throw std::runtime_error("failed to read exposure-duration");
 		}
 		Write(0x00020000, 0x01);
-		state_ = 1;
+		// 设置状态参数
+		state_ = CAMERA_EXPOSE;
 
 		return true;
 	}
@@ -189,21 +190,23 @@ void CameraGY::StopExpose() {
 	try {
 		Write(0x20050, 0x1);
 		aborted_ = true;
-//		state_ = 0;	// 中断且抛弃已累积数据
+		state_ = CAMERA_IDLE;	// 中断且抛弃已累积数据
+		imgrdy_.notify_one();	// 中断读出过程
 	}
 	catch(std::runtime_error& ex) {
 		nfcam_->errmsg = ex.what();
-		state_ = -1;
+		state_ = CAMERA_ERROR;
+		imgrdy_.notify_one();	// 中断读出过程
 	}
 }
 
 // 相机工作状态
-int CameraGY::CameraState() {
+CAMERA_STATUS CameraGY::CameraState() {
 	return state_;
 }
 
 // 数据读出操作
-void CameraGY::DownloadImage() {
+CAMERA_STATUS CameraGY::DownloadImage() {
 	boost::mutex tmp;
 	mutex_lock lck(tmp);
 	imgrdy_.wait(lck); // 等待图像就绪标志
@@ -217,7 +220,8 @@ void CameraGY::DownloadImage() {
 			data += len;
 		}
 	}
-	state_ = (aborted_ || bytercd_ < byteimg_) ? -1 : 0;
+
+	return state_;
 }
 
 bool CameraGY::Write(uint32_t addr, uint32_t val) {
@@ -266,13 +270,8 @@ void CameraGY::Retransmit() {
 	int n = packtot_;
 
 	for (i = 1; i <= n && packflag_[i]; ++i);
-	if (i > n) {
-		/* 所有包都已接收, 但数据量不对, 数据包接收不完整, 网络状态异常
-		 * - 终止读出过程
-		 * - 终止程序, 需要用户干预检查网络状态或相机状态
-		 */
-//		if (!aborted_) imgrdy_.notify_one();
-//		else state_ = -1;
+	if (i > n) {// 接收错误
+		state_ = CAMERA_ERROR;
 		imgrdy_.notify_one();
 	}
 	else {
@@ -283,7 +282,7 @@ void CameraGY::Retransmit() {
 	}
 }
 
-bool CameraGY::Retransmit(uint32_t iPack0, uint32_t iPack1) {
+void CameraGY::Retransmit(uint32_t iPack0, uint32_t iPack1) {
 	mutex_lock lck(mtxReg_);
 	boost::array<uint8_t, 20> buff = {0x42, 0x00, 0x00, 0x40, 0x00, 0x0c};
 	((uint16_t*)&buff)[3] = htons(++msgcnt_);
@@ -291,8 +290,6 @@ bool CameraGY::Retransmit(uint32_t iPack0, uint32_t iPack1) {
 	((uint32_t*)&buff)[3] = htonl(iPack0);
 	((uint32_t*)&buff)[4] = htonl(iPack1);
 	udpcmd_->write(buff.c_array(), buff.size());
-
-	return true;
 }
 
 uint32_t CameraGY::GetHostAddr() {
@@ -345,41 +342,63 @@ const char *CameraGY::UpdateNetwork(const uint32_t addr, const char *vstr) {
 }
 
 void CameraGY::ThreadHB() {
-	boost::chrono::milliseconds p(1000);	// 闲(非曝光)态心跳周期: 1秒c
-	ptime now;
-	ptime::time_duration_type td;
-	int busy_t1(p.count() * 3), busy_t2(busy_t1 - 86400000);	// 忙(曝光)态无反馈阈值
-	int dt;
-	bool brun(true);
+	boost::chrono::milliseconds period(1000);	// 心跳周期: 5秒
 
-	while(brun) {
+	while(true) {
 		boost::this_thread::sleep_for(p);
+
 		try {
 			Write(0x0938, 0x2EE0);
-			if (nfail_) nfail_ = 0;
+			if (hbfail_) hbfail_ = 0;
 		}
 		catch(std::runtime_error& ex) {
-			++nfail_;
 			nfcam_->errmsg = ex.what();
-		}
+			if (++hbfail_ >= 5) {// 连续5次心跳错误, 触发相机断开、重新连接操作...
 
-		if (nfail_ < 5 && nfcam_->exposing) {
-			now = microsec_clock::universal_time();
-			td = now - nfcam_->tmobs;
-
-			if ((td.total_seconds() - nfcam_->eduration) > 10.0) {
-				StopExpose();
-				imgrdy_.notify_one();
 			}
-			else if (idFrame_ != 0xFFFF && bytercd_ < byteimg_) {
-				dt = now.time_of_day().total_milliseconds() - tmdata_;
-				if (dt > busy_t1 || dt < busy_t2) Retransmit();
-			}
-		}
-		else if (nfail_ >= 5) {
-			//...
 		}
 	}
+}
+
+void CameraGY::ThreadReadout() {
+	boost::chrono::milliseconds period(100);	// 闲(非曝光)态心跳周期: 100毫秒
+	boost::mutex mtx;
+	mutex_lock lck(mtx);
+	ptime now;
+	ptime::time_duration_type td;
+
+	while(state_ != CAMERA_ERROR) {
+		reading_.wait(lck);
+
+		while(state_ == CAMERA_IMGRDY) {
+			now = microsec_clock::universal_time();
+
+			td = now - nfcam_->tmobs;
+			if ((td.total_seconds() - nfcam_->eduration) > 10.0) {// 始终未进入读出状态
+
+			}
+			else {
+
+			}
+		}
+	}
+
+//	if (hbfail_ < 5 && nfcam_->exposing) {
+//		now = microsec_clock::universal_time();
+//		td = now - nfcam_->tmobs;
+//
+//		if ((td.total_seconds() - nfcam_->eduration) > 10.0) {
+//			StopExpose();
+//			imgrdy_.notify_one();
+//		}
+//		else if (idFrame_ != 0xFFFF && bytercd_ < byteimg_) {
+//			dt = now.time_of_day().total_milliseconds() - tmdata_;
+//			if (dt > busy_t1 || dt < busy_t2) Retransmit();
+//		}
+//	}
+//	else if (hbfail_ >= 5) {
+//		//...
+//	}
 }
 
 void CameraGY::UpdateTimeFlag(int64_t &flag) {
@@ -388,39 +407,43 @@ void CameraGY::UpdateTimeFlag(int64_t &flag) {
 
 void CameraGY::ReceiveDataCB(const long udp, const long len) {
 	UpdateTimeFlag(tmdata_);
-	if (bytercd_ == byteimg_) return; // 所有数据都已接收, 抛弃trailer
 
-	if (state_ == 1 && !aborted_) state_ = 2; // 相机状态置为曝光结束, 主程序设置时标(曝光结束)
+	if (bytercd_ == byteimg_) return; // 所有数据都已接收, 抛弃trailer
+	if (state_ == CAMERA_EXPOSE && !aborted_) {
+		state_ = CAMERA_IMGRDY; // 相机状态置为曝光结束, 主程序设置时标(曝光结束)
+	}
+
 	int n;
 	const uint8_t *pack = udpdata_->read(n);
-
 	uint16_t status  = (pack[0] << 8) | pack[1];
 	uint16_t idFrame = (pack[2] << 8) | pack[3];	// 图像帧编号
 	uint8_t  type    = pack[4]; // 数据包类型
 	uint32_t idPack  = (pack[5] << 16) | (pack[6] << 8) | pack[7]; // 包编号
-	if (type == ID_LEADER) {// idPack_==0
+
+	if (type == ID_LEADER) {// 数据包头: idPack_==0
 		idFrame_ = idFrame;
 		idPack_  = idPack;
 	}
-	else if (type == ID_PAYLOAD) {
-		// 处理收到的数据包
+	else if (type == ID_PAYLOAD) {// 有效数据包
 		uint32_t packlen = len - headlen_;
 		uint8_t *ptr = bufpack_.get() + idPack * packlen_;
+
 		if (idPack == packtot_) packlen -= 64;
 		((uint32_t*) ptr)[0] = packlen;
 		memcpy(ptr + 4, pack + headlen_, packlen);
 		packflag_[idPack] = 1;
 		bytercd_ += packlen;
-		packflag_[idPack] = 1;
-		// 检测数据是否完整接收
-		if (bytercd_ == byteimg_) imgrdy_.notify_one();
+
+		if (bytercd_ == byteimg_) {// 若已接收所有数据
+			imgrdy_.notify_one();
+		}
 		else {// 数据接收完毕, 合并数据
-			if (idFrame_ == 0xFFFF) idFrame_ = idFrame;// 未收到leader
-			else if (idPack != (idPack_ + 1)) Retransmit(); // 立即重传?
+			if (idFrame_ == 0xFFFF) idFrame_ = idFrame;// 未收到包头
+			else if (idPack != (idPack_ + 1)) Retransmit(); // 立即申请重传
 			idPack_ = idPack;
 		}
 	}
-	else if (type == ID_TRAILER) {
+	else if (type == ID_TRAILER) {// 数据包尾
 		if (aborted_) {// 中止时收到包尾, 通知完成数据接收
 			imgrdy_.notify_one();
 		}

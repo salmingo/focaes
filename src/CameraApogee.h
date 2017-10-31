@@ -89,16 +89,15 @@ protected:
 	/*!
 	 * @brief 相机工作状态
 	 * @return
-	 * -1: 错误
-	 *  0: 空闲
-	 *  1: 曝光中
-	 *  2: 曝光结束
+	 * 工作状态
 	 */
-	int CameraState();
+	CAMERA_STATUS CameraState();
 	/*!
 	 * @brief 继承类实现真正数据读出操作
+	 * @return
+	 * 工作状态
 	 */
-	void DownloadImage();
+	CAMERA_STATUS DownloadImage();
 };
 
 #endif /* CAMERAAPOGEE_H_ */

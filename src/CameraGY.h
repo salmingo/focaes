@@ -145,16 +145,15 @@ protected:
 	/*!
 	 * @brief 相机工作状态
 	 * @return
-	 * -1: 错误
-	 *  0: 空闲
-	 *  1: 曝光中
-	 *  2: 曝光结束
+	 * 工作状态
 	 */
-	int CameraState();
+	CAMERA_STATUS CameraState();
 	/*!
 	 * @brief 继承类实现真正数据读出操作
+	 * @return
+	 * 工作状态
 	 */
-	void DownloadImage();
+	CAMERA_STATUS DownloadImage();
 
 private:
 	/*!
@@ -181,10 +180,8 @@ private:
 	 * @brief 请求重传数据帧
 	 * @param iPack0 重传帧起始编号
 	 * @param iPack1 重传帧结束编号
-	 * @return
-	 * 重传指令处理结果
 	 */
-	bool Retransmit(uint32_t iPack0, uint32_t iPack1);
+	void Retransmit(uint32_t iPack0, uint32_t iPack1);
 	/*!
 	 * @brief 查看与相机IP在同一网段的本机IP地址
 	 * @return
@@ -206,6 +203,10 @@ private:
 	 */
 	void ThreadHB();
 	/*!
+	 * @brief 线程: 监测读出过程
+	 */
+	void ThreadReadout();
+	/*!
 	 * @brief 当收到相机反馈信息时更新时间戳
 	 * @param flag 时间戳
 	 */
@@ -224,7 +225,7 @@ private:
 	uint32_t expdur_;		//< 曝光时间, 量纲: 微秒
 	uint32_t shtrmode_;		//< 快门模式. 0: Normal; 1: AlwaysOpen; 2: AlwaysClose
 	uint32_t gain_;			//< 增益. 0: 1x; 1: 2x; 2: 3x. x: e-/ADU
-	int state_;				//< 工作状态
+	CAMERA_STATUS state_;	//< 工作状态
 	bool aborted_;			//< 中止曝光标识
 	/* 相关定义: 控制指令 */
 	/*!
@@ -233,7 +234,11 @@ private:
 	udpptr udpcmd_;			//< 与相机间UDP指令接口
 	uint16_t msgcnt_;		//< 指令帧序列编号
 	boost::mutex mtxReg_;	//< 相机寄存器互斥锁
+	// 线程相关
+	int hbfail_;			//< 心跳连续错误计数
 	threadptr thHB_;		//< 心跳线程
+	threadptr thReadout_;	//< 读出线程
+	boost::condition_variable reading_;	//< 开始并进入图像读出状态
 	/* 相关定义: 图像数据 */
 	udpptr udpdata_;		//< 与相机间UDP数据接口
 	int64_t tmdata_;		//< 数据时间戳
@@ -256,7 +261,6 @@ private:
 	uint16_t idFrame_;	//< 图像帧编号
 	uint32_t idPack_;	//< 一帧图像中的包编号
 	boost::condition_variable imgrdy_;	//< 等待完成图像读出
-	int nfail_;	//< 心跳连续错误计数
 };
 
 #endif /* CAMERAGY_H_ */
