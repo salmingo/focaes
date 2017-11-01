@@ -100,13 +100,11 @@ public:
 		tmobs = microsec_clock::universal_time();
 		eduration = duration;
 		state     = CAMERA_EXPOSE;
-//		exposing  = true;
 	}
 
 	void end_expose() {
 		ptime now = microsec_clock::universal_time();
 		timeend = to_simple_string(now.time_of_day());
-//		exposing = false;
 	}
 
 	/*!

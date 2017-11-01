@@ -172,7 +172,6 @@ focaes.o: focaes.cpp /usr/include/stdc-predef.h \
  /usr/local/include/boost/core/addressof.hpp \
  /usr/local/include/boost/smart_ptr/detail/sp_convertible.hpp \
  /usr/local/include/boost/smart_ptr/detail/sp_nullptr_t.hpp \
- /usr/local/include/boost/smart_ptr/detail/sp_noexcept.hpp \
  /usr/local/include/boost/smart_ptr/detail/spinlock_pool.hpp \
  /usr/local/include/boost/smart_ptr/detail/spinlock.hpp \
  /usr/local/include/boost/smart_ptr/detail/spinlock_sync.hpp \
@@ -511,16 +510,6 @@ focaes.o: focaes.cpp /usr/include/stdc-predef.h \
  /usr/local/include/boost/type_traits/is_rvalue_reference.hpp \
  /usr/local/include/boost/type_traits/is_function.hpp \
  /usr/local/include/boost/type_traits/detail/is_function_ptr_helper.hpp \
- /usr/local/include/boost/type_traits/is_constructible.hpp \
- /usr/local/include/boost/type_traits/is_default_constructible.hpp \
- /usr/local/include/boost/type_traits/is_pod.hpp \
- /usr/local/include/boost/type_traits/is_scalar.hpp \
- /usr/local/include/boost/type_traits/is_enum.hpp \
- /usr/local/include/boost/type_traits/is_pointer.hpp \
- /usr/local/include/boost/type_traits/is_member_pointer.hpp \
- /usr/local/include/boost/type_traits/is_member_function_pointer.hpp \
- /usr/local/include/boost/type_traits/detail/is_mem_fun_pointer_impl.hpp \
- /usr/local/include/boost/type_traits/is_unsigned.hpp \
  /usr/local/include/boost/interprocess/detail/cast_tags.hpp \
  /usr/local/include/longnam.h /usr/local/include/fitsio.h \
  /usr/local/include/longnam.h /usr/local/include/xpa.h \
@@ -605,6 +594,12 @@ focaes.o: focaes.cpp /usr/include/stdc-predef.h \
  /usr/local/include/boost/type_traits/remove_pointer.hpp \
  /usr/local/include/boost/type_traits/type_identity.hpp \
  /usr/local/include/boost/type_traits/is_union.hpp \
+ /usr/local/include/boost/type_traits/is_pointer.hpp \
+ /usr/local/include/boost/type_traits/is_member_pointer.hpp \
+ /usr/local/include/boost/type_traits/is_member_function_pointer.hpp \
+ /usr/local/include/boost/type_traits/detail/is_mem_fun_pointer_impl.hpp \
+ /usr/local/include/boost/type_traits/is_unsigned.hpp \
+ /usr/local/include/boost/type_traits/is_enum.hpp \
  /usr/local/include/boost/chrono/detail/is_evenly_divisible_by.hpp \
  /usr/include/c++/4.8.2/iostream \
  /usr/local/include/boost/thread/mutex.hpp \
@@ -753,11 +748,22 @@ focaes.o: focaes.cpp /usr/include/stdc-predef.h \
  /usr/local/include/boost/smart_ptr/detail/sp_forward.hpp \
  /usr/local/include/boost/type_traits/type_with_alignment.hpp \
  /usr/local/include/boost/type_traits/alignment_of.hpp \
+ /usr/local/include/boost/type_traits/is_pod.hpp \
+ /usr/local/include/boost/type_traits/is_scalar.hpp \
  /usr/local/include/boost/smart_ptr/make_shared_array.hpp \
- /usr/local/include/boost/smart_ptr/allocate_shared_array.hpp \
+ /usr/local/include/boost/smart_ptr/detail/array_count_impl.hpp \
+ /usr/local/include/boost/smart_ptr/detail/array_allocator.hpp \
+ /usr/local/include/boost/align/align.hpp \
+ /usr/local/include/boost/align/detail/align.hpp \
+ /usr/local/include/boost/align/detail/is_alignment.hpp \
+ /usr/local/include/boost/smart_ptr/detail/array_traits.hpp \
+ /usr/local/include/boost/smart_ptr/detail/array_utility.hpp \
  /usr/local/include/boost/type_traits/has_trivial_constructor.hpp \
+ /usr/local/include/boost/type_traits/is_default_constructible.hpp \
  /usr/local/include/boost/type_traits/has_trivial_destructor.hpp \
  /usr/local/include/boost/type_traits/is_destructible.hpp \
+ /usr/local/include/boost/smart_ptr/detail/sp_if_array.hpp \
+ /usr/local/include/boost/smart_ptr/allocate_shared_array.hpp \
  /usr/local/include/boost/utility/result_of.hpp \
  /usr/local/include/boost/preprocessor/iteration/iterate.hpp \
  /usr/local/include/boost/preprocessor/array/elem.hpp \
@@ -808,7 +814,6 @@ focaes.o: focaes.cpp /usr/include/stdc-predef.h \
  /usr/local/include/boost/exception/detail/type_info.hpp \
  /usr/include/c++/4.8.2/iomanip \
  /usr/local/include/boost/exception/detail/error_info_impl.hpp \
- /usr/local/include/boost/exception/detail/shared_ptr.hpp \
  /usr/local/include/boost/exception/diagnostic_information.hpp \
  /usr/local/include/boost/exception/get_error_info.hpp \
  /usr/local/include/boost/exception/current_exception_cast.hpp \
@@ -1058,6 +1063,7 @@ focaes.o: focaes.cpp /usr/include/stdc-predef.h \
  /usr/local/include/boost/detail/lcast_precision.hpp \
  /usr/local/include/boost/lexical_cast/detail/widest_char.hpp \
  /usr/local/include/boost/array.hpp /usr/local/include/boost/swap.hpp \
+ /usr/local/include/boost/functional/hash_fwd.hpp \
  /usr/local/include/boost/lexical_cast/detail/converter_lexical_streams.hpp \
  /usr/local/include/boost/lexical_cast/detail/lcast_char_constants.hpp \
  /usr/local/include/boost/lexical_cast/detail/lcast_unsigned_converters.hpp \
@@ -1247,6 +1253,7 @@ focaes.o: focaes.cpp /usr/include/stdc-predef.h \
  /usr/local/include/boost/core/explicit_operator_bool.hpp \
  /usr/local/include/boost/optional/bad_optional_access.hpp \
  /usr/local/include/boost/type_traits/has_nothrow_constructor.hpp \
+ /usr/local/include/boost/type_traits/is_constructible.hpp \
  /usr/local/include/boost/type_traits/is_nothrow_move_assignable.hpp \
  /usr/local/include/boost/type_traits/has_trivial_move_assign.hpp \
  /usr/local/include/boost/type_traits/is_assignable.hpp \
@@ -1338,8 +1345,6 @@ focaes.o: focaes.cpp /usr/include/stdc-predef.h \
  /usr/local/include/boost/archive/detail/abi_prefix.hpp \
  /usr/local/include/boost/archive/detail/abi_suffix.hpp \
  /usr/local/include/boost/serialization/access.hpp \
- /usr/local/include/boost/multi_index/detail/ignore_wstrict_aliasing.hpp \
- /usr/local/include/boost/multi_index/detail/restore_wstrict_aliasing.hpp \
  /usr/local/include/boost/multi_index/detail/is_index_list.hpp \
  /usr/local/include/boost/mpl/empty.hpp \
  /usr/local/include/boost/mpl/aux_/empty_impl.hpp \
@@ -1387,7 +1392,6 @@ focaes.o: focaes.cpp /usr/include/stdc-predef.h \
  /usr/local/include/boost/multi_index/detail/uintptr_type.hpp \
  /usr/local/include/boost/multi_index/detail/ord_index_ops.hpp \
  /usr/local/include/boost/multi_index/detail/promotes_arg.hpp \
- /usr/local/include/boost/multi_index/detail/is_transparent.hpp \
  /usr/local/include/boost/multi_index/detail/unbounded.hpp \
  /usr/local/include/boost/multi_index/detail/value_compare.hpp \
  /usr/local/include/boost/multi_index/detail/duplicates_iterator.hpp \
@@ -1494,7 +1498,6 @@ focaes.o: focaes.cpp /usr/include/stdc-predef.h \
  /usr/local/include/boost/variant/detail/cast_storage.hpp \
  /usr/local/include/boost/variant/detail/hash_variant.hpp \
  /usr/local/include/boost/variant/static_visitor.hpp \
- /usr/local/include/boost/functional/hash_fwd.hpp \
  /usr/local/include/boost/blank.hpp \
  /usr/local/include/boost/detail/templated_streams.hpp \
  /usr/local/include/boost/type_traits/is_empty.hpp \
@@ -2342,8 +2345,6 @@ focaes.o: focaes.cpp /usr/include/stdc-predef.h \
 
 /usr/local/include/boost/smart_ptr/detail/sp_nullptr_t.hpp:
 
-/usr/local/include/boost/smart_ptr/detail/sp_noexcept.hpp:
-
 /usr/local/include/boost/smart_ptr/detail/spinlock_pool.hpp:
 
 /usr/local/include/boost/smart_ptr/detail/spinlock.hpp:
@@ -3044,26 +3045,6 @@ focaes.o: focaes.cpp /usr/include/stdc-predef.h \
 
 /usr/local/include/boost/type_traits/detail/is_function_ptr_helper.hpp:
 
-/usr/local/include/boost/type_traits/is_constructible.hpp:
-
-/usr/local/include/boost/type_traits/is_default_constructible.hpp:
-
-/usr/local/include/boost/type_traits/is_pod.hpp:
-
-/usr/local/include/boost/type_traits/is_scalar.hpp:
-
-/usr/local/include/boost/type_traits/is_enum.hpp:
-
-/usr/local/include/boost/type_traits/is_pointer.hpp:
-
-/usr/local/include/boost/type_traits/is_member_pointer.hpp:
-
-/usr/local/include/boost/type_traits/is_member_function_pointer.hpp:
-
-/usr/local/include/boost/type_traits/detail/is_mem_fun_pointer_impl.hpp:
-
-/usr/local/include/boost/type_traits/is_unsigned.hpp:
-
 /usr/local/include/boost/interprocess/detail/cast_tags.hpp:
 
 /usr/local/include/longnam.h:
@@ -3241,6 +3222,18 @@ GLog.h:
 /usr/local/include/boost/type_traits/type_identity.hpp:
 
 /usr/local/include/boost/type_traits/is_union.hpp:
+
+/usr/local/include/boost/type_traits/is_pointer.hpp:
+
+/usr/local/include/boost/type_traits/is_member_pointer.hpp:
+
+/usr/local/include/boost/type_traits/is_member_function_pointer.hpp:
+
+/usr/local/include/boost/type_traits/detail/is_mem_fun_pointer_impl.hpp:
+
+/usr/local/include/boost/type_traits/is_unsigned.hpp:
+
+/usr/local/include/boost/type_traits/is_enum.hpp:
 
 /usr/local/include/boost/chrono/detail/is_evenly_divisible_by.hpp:
 
@@ -3556,15 +3549,37 @@ GLog.h:
 
 /usr/local/include/boost/type_traits/alignment_of.hpp:
 
+/usr/local/include/boost/type_traits/is_pod.hpp:
+
+/usr/local/include/boost/type_traits/is_scalar.hpp:
+
 /usr/local/include/boost/smart_ptr/make_shared_array.hpp:
 
-/usr/local/include/boost/smart_ptr/allocate_shared_array.hpp:
+/usr/local/include/boost/smart_ptr/detail/array_count_impl.hpp:
+
+/usr/local/include/boost/smart_ptr/detail/array_allocator.hpp:
+
+/usr/local/include/boost/align/align.hpp:
+
+/usr/local/include/boost/align/detail/align.hpp:
+
+/usr/local/include/boost/align/detail/is_alignment.hpp:
+
+/usr/local/include/boost/smart_ptr/detail/array_traits.hpp:
+
+/usr/local/include/boost/smart_ptr/detail/array_utility.hpp:
 
 /usr/local/include/boost/type_traits/has_trivial_constructor.hpp:
+
+/usr/local/include/boost/type_traits/is_default_constructible.hpp:
 
 /usr/local/include/boost/type_traits/has_trivial_destructor.hpp:
 
 /usr/local/include/boost/type_traits/is_destructible.hpp:
+
+/usr/local/include/boost/smart_ptr/detail/sp_if_array.hpp:
+
+/usr/local/include/boost/smart_ptr/allocate_shared_array.hpp:
 
 /usr/local/include/boost/utility/result_of.hpp:
 
@@ -3665,8 +3680,6 @@ GLog.h:
 /usr/include/c++/4.8.2/iomanip:
 
 /usr/local/include/boost/exception/detail/error_info_impl.hpp:
-
-/usr/local/include/boost/exception/detail/shared_ptr.hpp:
 
 /usr/local/include/boost/exception/diagnostic_information.hpp:
 
@@ -4168,6 +4181,8 @@ GLog.h:
 
 /usr/local/include/boost/swap.hpp:
 
+/usr/local/include/boost/functional/hash_fwd.hpp:
+
 /usr/local/include/boost/lexical_cast/detail/converter_lexical_streams.hpp:
 
 /usr/local/include/boost/lexical_cast/detail/lcast_char_constants.hpp:
@@ -4550,6 +4565,8 @@ parameter.h:
 
 /usr/local/include/boost/type_traits/has_nothrow_constructor.hpp:
 
+/usr/local/include/boost/type_traits/is_constructible.hpp:
+
 /usr/local/include/boost/type_traits/is_nothrow_move_assignable.hpp:
 
 /usr/local/include/boost/type_traits/has_trivial_move_assign.hpp:
@@ -4734,10 +4751,6 @@ parameter.h:
 
 /usr/local/include/boost/serialization/access.hpp:
 
-/usr/local/include/boost/multi_index/detail/ignore_wstrict_aliasing.hpp:
-
-/usr/local/include/boost/multi_index/detail/restore_wstrict_aliasing.hpp:
-
 /usr/local/include/boost/multi_index/detail/is_index_list.hpp:
 
 /usr/local/include/boost/mpl/empty.hpp:
@@ -4831,8 +4844,6 @@ parameter.h:
 /usr/local/include/boost/multi_index/detail/ord_index_ops.hpp:
 
 /usr/local/include/boost/multi_index/detail/promotes_arg.hpp:
-
-/usr/local/include/boost/multi_index/detail/is_transparent.hpp:
 
 /usr/local/include/boost/multi_index/detail/unbounded.hpp:
 
@@ -5047,8 +5058,6 @@ tcp_asio.h:
 /usr/local/include/boost/variant/detail/hash_variant.hpp:
 
 /usr/local/include/boost/variant/static_visitor.hpp:
-
-/usr/local/include/boost/functional/hash_fwd.hpp:
 
 /usr/local/include/boost/blank.hpp:
 

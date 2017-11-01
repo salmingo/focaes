@@ -492,14 +492,21 @@ void ResolveFocus() {
 
 /*==========================================================================*/
 void ExposeProcessCB(const double left, const double percent, const int status) {
-	if (status == -1) {// 失败
+	switch((CAMERA_STATUS) status) {
+	case CAMERA_ERROR:  // 错误, 需要重启相机等操作
 		PostMessage(5);
-	}
-	else if (status == 1) {// 完成
-		PostMessage(4);
-	}
-	else if (status == 2) {// 曝光中
+		break;
+	case CAMERA_IDLE:   // 中止曝光
+		PostMessage(6);
+		break;
+	case CAMERA_EXPOSE: // 曝光过程中
 		PrintExprocess(percent);
+		break;
+	case CAMERA_IMGRDY: // 图像准备完成, 可以存储等操作
+		PostMessage(4);
+		break;
+	default:
+		break;
 	}
 }
 
@@ -614,6 +621,21 @@ void ExposeComplete() {
 }
 
 /*!
+ * @brief 中止曝光
+ */
+void ExposeAbort() {
+	state.mode = MODE_INIT;
+	ShowCursor(false);
+	ClearError();
+	PrintXY(1, LINE_STATUS, "exposure is aborted");
+
+	mutex_lock lck(mtxcur);
+	MovetoXY(curpos, LINE_INPUT);
+	ShowCursor(true);
+	UpdateScreen();
+}
+
+/*!
  * @brief 曝光失败
  */
 void ExposeFail() {
@@ -677,6 +699,9 @@ void ThreadMessageQueue() {
 			break;
 		case 5:// 曝光失败
 			ExposeFail();
+			break;
+		case 6:// 中止曝光
+			ExposeAbort();
 			break;
 		default:
 			break;
@@ -903,11 +928,8 @@ int MainBody() {// 主工作流程
 			}
 			else if (!strcasecmp(token, "stop")) {// 尝试中止观测流程
 				if (state.mode != MODE_INIT) {// 中止观测流程
-					if (camera->GetCameraInfo()->exposing)
+					if (camera->GetCameraInfo()->state >= CAMERA_EXPOSE)
 						camera->AbortExpose();
-					state.mode = MODE_INIT;
-					ClearError();
-					PrintXY(1, LINE_STATUS, "exposure is aborted");
 				}
 				else PrintXY(1, LINE_ERROR, "system is idle");
 			}

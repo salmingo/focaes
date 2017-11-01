@@ -213,7 +213,6 @@ GLog.o: GLog.cpp /usr/include/stdc-predef.h /usr/include/sys/stat.h \
  /usr/local/include/boost/core/addressof.hpp \
  /usr/local/include/boost/smart_ptr/detail/sp_convertible.hpp \
  /usr/local/include/boost/smart_ptr/detail/sp_nullptr_t.hpp \
- /usr/local/include/boost/smart_ptr/detail/sp_noexcept.hpp \
  /usr/local/include/boost/smart_ptr/detail/spinlock_pool.hpp \
  /usr/local/include/boost/smart_ptr/detail/spinlock.hpp \
  /usr/local/include/boost/smart_ptr/detail/spinlock_sync.hpp \
@@ -699,11 +698,19 @@ GLog.o: GLog.cpp /usr/include/stdc-predef.h /usr/include/sys/stat.h \
  /usr/local/include/boost/type_traits/is_pod.hpp \
  /usr/local/include/boost/type_traits/is_scalar.hpp \
  /usr/local/include/boost/smart_ptr/make_shared_array.hpp \
- /usr/local/include/boost/smart_ptr/allocate_shared_array.hpp \
+ /usr/local/include/boost/smart_ptr/detail/array_count_impl.hpp \
+ /usr/local/include/boost/smart_ptr/detail/array_allocator.hpp \
+ /usr/local/include/boost/align/align.hpp \
+ /usr/local/include/boost/align/detail/align.hpp \
+ /usr/local/include/boost/align/detail/is_alignment.hpp \
+ /usr/local/include/boost/smart_ptr/detail/array_traits.hpp \
+ /usr/local/include/boost/smart_ptr/detail/array_utility.hpp \
  /usr/local/include/boost/type_traits/has_trivial_constructor.hpp \
  /usr/local/include/boost/type_traits/is_default_constructible.hpp \
  /usr/local/include/boost/type_traits/has_trivial_destructor.hpp \
  /usr/local/include/boost/type_traits/is_destructible.hpp \
+ /usr/local/include/boost/smart_ptr/detail/sp_if_array.hpp \
+ /usr/local/include/boost/smart_ptr/allocate_shared_array.hpp \
  /usr/local/include/boost/utility/result_of.hpp \
  /usr/local/include/boost/preprocessor/iteration/iterate.hpp \
  /usr/local/include/boost/preprocessor/array/elem.hpp \
@@ -754,7 +761,6 @@ GLog.o: GLog.cpp /usr/include/stdc-predef.h /usr/include/sys/stat.h \
  /usr/local/include/boost/exception/detail/type_info.hpp \
  /usr/include/c++/4.8.2/iomanip \
  /usr/local/include/boost/exception/detail/error_info_impl.hpp \
- /usr/local/include/boost/exception/detail/shared_ptr.hpp \
  /usr/local/include/boost/exception/diagnostic_information.hpp \
  /usr/local/include/boost/exception/get_error_info.hpp \
  /usr/local/include/boost/exception/current_exception_cast.hpp \
@@ -1005,6 +1011,7 @@ GLog.o: GLog.cpp /usr/include/stdc-predef.h /usr/include/sys/stat.h \
  /usr/local/include/boost/detail/lcast_precision.hpp \
  /usr/local/include/boost/lexical_cast/detail/widest_char.hpp \
  /usr/local/include/boost/array.hpp /usr/local/include/boost/swap.hpp \
+ /usr/local/include/boost/functional/hash_fwd.hpp \
  /usr/local/include/boost/lexical_cast/detail/converter_lexical_streams.hpp \
  /usr/include/c++/4.8.2/cstdio \
  /usr/local/include/boost/lexical_cast/detail/lcast_char_constants.hpp \
@@ -1694,8 +1701,6 @@ GLog.h:
 /usr/local/include/boost/smart_ptr/detail/sp_convertible.hpp:
 
 /usr/local/include/boost/smart_ptr/detail/sp_nullptr_t.hpp:
-
-/usr/local/include/boost/smart_ptr/detail/sp_noexcept.hpp:
 
 /usr/local/include/boost/smart_ptr/detail/spinlock_pool.hpp:
 
@@ -2715,7 +2720,19 @@ GLog.h:
 
 /usr/local/include/boost/smart_ptr/make_shared_array.hpp:
 
-/usr/local/include/boost/smart_ptr/allocate_shared_array.hpp:
+/usr/local/include/boost/smart_ptr/detail/array_count_impl.hpp:
+
+/usr/local/include/boost/smart_ptr/detail/array_allocator.hpp:
+
+/usr/local/include/boost/align/align.hpp:
+
+/usr/local/include/boost/align/detail/align.hpp:
+
+/usr/local/include/boost/align/detail/is_alignment.hpp:
+
+/usr/local/include/boost/smart_ptr/detail/array_traits.hpp:
+
+/usr/local/include/boost/smart_ptr/detail/array_utility.hpp:
 
 /usr/local/include/boost/type_traits/has_trivial_constructor.hpp:
 
@@ -2724,6 +2741,10 @@ GLog.h:
 /usr/local/include/boost/type_traits/has_trivial_destructor.hpp:
 
 /usr/local/include/boost/type_traits/is_destructible.hpp:
+
+/usr/local/include/boost/smart_ptr/detail/sp_if_array.hpp:
+
+/usr/local/include/boost/smart_ptr/allocate_shared_array.hpp:
 
 /usr/local/include/boost/utility/result_of.hpp:
 
@@ -2824,8 +2845,6 @@ GLog.h:
 /usr/include/c++/4.8.2/iomanip:
 
 /usr/local/include/boost/exception/detail/error_info_impl.hpp:
-
-/usr/local/include/boost/exception/detail/shared_ptr.hpp:
 
 /usr/local/include/boost/exception/diagnostic_information.hpp:
 
@@ -3328,6 +3347,8 @@ GLog.h:
 /usr/local/include/boost/array.hpp:
 
 /usr/local/include/boost/swap.hpp:
+
+/usr/local/include/boost/functional/hash_fwd.hpp:
 
 /usr/local/include/boost/lexical_cast/detail/converter_lexical_streams.hpp:
 

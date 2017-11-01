@@ -160,18 +160,18 @@ private:
 	 * @brief 更改寄存器对应地址数值
 	 * @param addr 地址
 	 * @param val  数值
-	 * @return
-	 * 更改结果
+	 * @note
+	 * 操作失败抛出异常
 	 */
-	bool Write(uint32_t addr, uint32_t val);
+	void Write(uint32_t addr, uint32_t val);
 	/*!
 	 * @brief 查看寄存器对应地址数值
 	 * @param addr 地址
 	 * @param val  数值
-	 * @return
-	 * 查看结果
+	 * @note
+	 * 操作失败抛出异常
 	 */
-	bool Read(uint32_t addr, uint32_t &val);
+	void Read(uint32_t addr, uint32_t &val);
 	/*!
 	 * @brief 检查并触发数据重传
 	 */
@@ -238,7 +238,7 @@ private:
 	int hbfail_;			//< 心跳连续错误计数
 	threadptr thHB_;		//< 心跳线程
 	threadptr thReadout_;	//< 读出线程
-	boost::condition_variable reading_;	//< 开始并进入图像读出状态
+	boost::condition_variable waitread_;	//< 等待完成图像读出
 	/* 相关定义: 图像数据 */
 	udpptr udpdata_;		//< 与相机间UDP数据接口
 	int64_t tmdata_;		//< 数据时间戳

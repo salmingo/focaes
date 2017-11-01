@@ -278,7 +278,6 @@ CameraApogee.o: CameraApogee.cpp /usr/include/stdc-predef.h \
  /usr/local/include/boost/core/addressof.hpp \
  /usr/local/include/boost/smart_ptr/detail/sp_convertible.hpp \
  /usr/local/include/boost/smart_ptr/detail/sp_nullptr_t.hpp \
- /usr/local/include/boost/smart_ptr/detail/sp_noexcept.hpp \
  /usr/local/include/boost/smart_ptr/detail/spinlock_pool.hpp \
  /usr/local/include/boost/smart_ptr/detail/spinlock.hpp \
  /usr/local/include/boost/smart_ptr/detail/spinlock_sync.hpp \
@@ -623,7 +622,6 @@ CameraApogee.o: CameraApogee.cpp /usr/include/stdc-predef.h \
  /usr/local/include/boost/preprocessor/logical/not.hpp \
  /usr/local/include/boost/utility/identity_type.hpp \
  /usr/local/include/boost/type_traits/function_traits.hpp \
- /usr/local/include/boost/core/noncopyable.hpp \
  /usr/local/include/boost/next_prior.hpp \
  /usr/local/include/boost/type_traits/integral_promotion.hpp \
  /usr/local/include/boost/type_traits/make_signed.hpp \
@@ -633,6 +631,8 @@ CameraApogee.o: CameraApogee.cpp /usr/include/stdc-predef.h \
  /usr/local/include/boost/type_traits/has_plus_assign.hpp \
  /usr/local/include/boost/type_traits/has_minus.hpp \
  /usr/local/include/boost/type_traits/has_minus_assign.hpp \
+ /usr/local/include/boost/noncopyable.hpp \
+ /usr/local/include/boost/core/noncopyable.hpp \
  /usr/local/include/boost/range/distance.hpp \
  /usr/local/include/boost/range/empty.hpp \
  /usr/local/include/boost/range/rbegin.hpp \
@@ -724,6 +724,8 @@ CameraApogee.o: CameraApogee.cpp /usr/include/stdc-predef.h \
  /usr/local/include/boost/lexical_cast/detail/widest_char.hpp \
  /usr/local/include/boost/array.hpp /usr/local/include/boost/swap.hpp \
  /usr/local/include/boost/core/swap.hpp \
+ /usr/local/include/boost/functional/hash_fwd.hpp \
+ /usr/local/include/boost/functional/hash/hash_fwd.hpp \
  /usr/local/include/boost/container/container_fwd.hpp \
  /usr/local/include/boost/container/detail/std_fwd.hpp \
  /usr/local/include/boost/move/detail/std_ns_begin.hpp \
@@ -734,7 +736,6 @@ CameraApogee.o: CameraApogee.cpp /usr/include/stdc-predef.h \
  /usr/include/bits/stdio.h \
  /usr/local/include/boost/lexical_cast/detail/lcast_char_constants.hpp \
  /usr/local/include/boost/lexical_cast/detail/lcast_unsigned_converters.hpp \
- /usr/local/include/boost/noncopyable.hpp \
  /usr/local/include/boost/lexical_cast/detail/inf_nan.hpp \
  /usr/local/include/boost/math/special_functions/sign.hpp \
  /usr/local/include/boost/math/tools/config.hpp \
@@ -1007,8 +1008,6 @@ CameraApogee.o: CameraApogee.cpp /usr/include/stdc-predef.h \
  /usr/local/include/boost/interprocess/sync/lock_options.hpp \
  /usr/local/include/boost/interprocess/detail/simple_swap.hpp \
  /usr/local/include/boost/interprocess/offset_ptr.hpp \
- /usr/local/include/boost/type_traits/is_constructible.hpp \
- /usr/local/include/boost/type_traits/is_default_constructible.hpp \
  /usr/local/include/boost/interprocess/detail/cast_tags.hpp \
  /usr/local/include/boost/smart_ptr.hpp \
  /usr/local/include/boost/scoped_ptr.hpp \
@@ -1031,10 +1030,19 @@ CameraApogee.o: CameraApogee.cpp /usr/include/stdc-predef.h \
  /usr/local/include/boost/type_traits/type_with_alignment.hpp \
  /usr/local/include/boost/type_traits/alignment_of.hpp \
  /usr/local/include/boost/smart_ptr/make_shared_array.hpp \
- /usr/local/include/boost/smart_ptr/allocate_shared_array.hpp \
+ /usr/local/include/boost/smart_ptr/detail/array_count_impl.hpp \
+ /usr/local/include/boost/smart_ptr/detail/array_allocator.hpp \
+ /usr/local/include/boost/align/align.hpp \
+ /usr/local/include/boost/align/detail/align.hpp \
+ /usr/local/include/boost/align/detail/is_alignment.hpp \
+ /usr/local/include/boost/smart_ptr/detail/array_traits.hpp \
+ /usr/local/include/boost/smart_ptr/detail/array_utility.hpp \
  /usr/local/include/boost/type_traits/has_trivial_constructor.hpp \
+ /usr/local/include/boost/type_traits/is_default_constructible.hpp \
  /usr/local/include/boost/type_traits/has_trivial_destructor.hpp \
  /usr/local/include/boost/type_traits/is_destructible.hpp \
+ /usr/local/include/boost/smart_ptr/detail/sp_if_array.hpp \
+ /usr/local/include/boost/smart_ptr/allocate_shared_array.hpp \
  /usr/local/include/boost/thread.hpp \
  /usr/local/include/boost/thread/thread.hpp \
  /usr/local/include/boost/thread/thread_only.hpp \
@@ -1123,7 +1131,6 @@ CameraApogee.o: CameraApogee.cpp /usr/include/stdc-predef.h \
  /usr/local/include/boost/bind/placeholders.hpp \
  /usr/local/include/boost/functional/hash.hpp \
  /usr/local/include/boost/functional/hash/hash.hpp \
- /usr/local/include/boost/functional/hash/hash_fwd.hpp \
  /usr/local/include/boost/functional/hash/detail/hash_float.hpp \
  /usr/local/include/boost/functional/hash/detail/float_functions.hpp \
  /usr/local/include/boost/functional/hash/detail/limits.hpp \
@@ -1219,7 +1226,6 @@ CameraApogee.o: CameraApogee.cpp /usr/include/stdc-predef.h \
  /usr/local/include/boost/exception/detail/object_hex_dump.hpp \
  /usr/local/include/boost/exception/detail/type_info.hpp \
  /usr/local/include/boost/exception/detail/error_info_impl.hpp \
- /usr/local/include/boost/exception/detail/shared_ptr.hpp \
  /usr/local/include/boost/exception/diagnostic_information.hpp \
  /usr/local/include/boost/exception/get_error_info.hpp \
  /usr/local/include/boost/exception/current_exception_cast.hpp \
@@ -1270,6 +1276,7 @@ CameraApogee.o: CameraApogee.cpp /usr/include/stdc-predef.h \
  /usr/local/include/boost/core/explicit_operator_bool.hpp \
  /usr/local/include/boost/optional/bad_optional_access.hpp \
  /usr/local/include/boost/type_traits/has_nothrow_constructor.hpp \
+ /usr/local/include/boost/type_traits/is_constructible.hpp \
  /usr/local/include/boost/type_traits/is_nothrow_move_assignable.hpp \
  /usr/local/include/boost/type_traits/has_trivial_move_assign.hpp \
  /usr/local/include/boost/type_traits/is_assignable.hpp \
@@ -1348,7 +1355,6 @@ CameraApogee.o: CameraApogee.cpp /usr/include/stdc-predef.h \
  /usr/local/include/boost/variant/detail/cast_storage.hpp \
  /usr/local/include/boost/variant/detail/hash_variant.hpp \
  /usr/local/include/boost/variant/static_visitor.hpp \
- /usr/local/include/boost/functional/hash_fwd.hpp \
  /usr/local/include/boost/aligned_storage.hpp \
  /usr/local/include/boost/blank.hpp \
  /usr/local/include/boost/detail/templated_streams.hpp \
@@ -2125,8 +2131,6 @@ CameraBase.h:
 
 /usr/local/include/boost/smart_ptr/detail/sp_nullptr_t.hpp:
 
-/usr/local/include/boost/smart_ptr/detail/sp_noexcept.hpp:
-
 /usr/local/include/boost/smart_ptr/detail/spinlock_pool.hpp:
 
 /usr/local/include/boost/smart_ptr/detail/spinlock.hpp:
@@ -2825,8 +2829,6 @@ CameraBase.h:
 
 /usr/local/include/boost/type_traits/function_traits.hpp:
 
-/usr/local/include/boost/core/noncopyable.hpp:
-
 /usr/local/include/boost/next_prior.hpp:
 
 /usr/local/include/boost/type_traits/integral_promotion.hpp:
@@ -2844,6 +2846,10 @@ CameraBase.h:
 /usr/local/include/boost/type_traits/has_minus.hpp:
 
 /usr/local/include/boost/type_traits/has_minus_assign.hpp:
+
+/usr/local/include/boost/noncopyable.hpp:
+
+/usr/local/include/boost/core/noncopyable.hpp:
 
 /usr/local/include/boost/range/distance.hpp:
 
@@ -3031,6 +3037,10 @@ CameraBase.h:
 
 /usr/local/include/boost/core/swap.hpp:
 
+/usr/local/include/boost/functional/hash_fwd.hpp:
+
+/usr/local/include/boost/functional/hash/hash_fwd.hpp:
+
 /usr/local/include/boost/container/container_fwd.hpp:
 
 /usr/local/include/boost/container/detail/std_fwd.hpp:
@@ -3054,8 +3064,6 @@ CameraBase.h:
 /usr/local/include/boost/lexical_cast/detail/lcast_char_constants.hpp:
 
 /usr/local/include/boost/lexical_cast/detail/lcast_unsigned_converters.hpp:
-
-/usr/local/include/boost/noncopyable.hpp:
 
 /usr/local/include/boost/lexical_cast/detail/inf_nan.hpp:
 
@@ -3621,10 +3629,6 @@ CameraBase.h:
 
 /usr/local/include/boost/interprocess/offset_ptr.hpp:
 
-/usr/local/include/boost/type_traits/is_constructible.hpp:
-
-/usr/local/include/boost/type_traits/is_default_constructible.hpp:
-
 /usr/local/include/boost/interprocess/detail/cast_tags.hpp:
 
 /usr/local/include/boost/smart_ptr.hpp:
@@ -3669,13 +3673,31 @@ CameraBase.h:
 
 /usr/local/include/boost/smart_ptr/make_shared_array.hpp:
 
-/usr/local/include/boost/smart_ptr/allocate_shared_array.hpp:
+/usr/local/include/boost/smart_ptr/detail/array_count_impl.hpp:
+
+/usr/local/include/boost/smart_ptr/detail/array_allocator.hpp:
+
+/usr/local/include/boost/align/align.hpp:
+
+/usr/local/include/boost/align/detail/align.hpp:
+
+/usr/local/include/boost/align/detail/is_alignment.hpp:
+
+/usr/local/include/boost/smart_ptr/detail/array_traits.hpp:
+
+/usr/local/include/boost/smart_ptr/detail/array_utility.hpp:
 
 /usr/local/include/boost/type_traits/has_trivial_constructor.hpp:
+
+/usr/local/include/boost/type_traits/is_default_constructible.hpp:
 
 /usr/local/include/boost/type_traits/has_trivial_destructor.hpp:
 
 /usr/local/include/boost/type_traits/is_destructible.hpp:
+
+/usr/local/include/boost/smart_ptr/detail/sp_if_array.hpp:
+
+/usr/local/include/boost/smart_ptr/allocate_shared_array.hpp:
 
 /usr/local/include/boost/thread.hpp:
 
@@ -3860,8 +3882,6 @@ CameraBase.h:
 /usr/local/include/boost/functional/hash.hpp:
 
 /usr/local/include/boost/functional/hash/hash.hpp:
-
-/usr/local/include/boost/functional/hash/hash_fwd.hpp:
 
 /usr/local/include/boost/functional/hash/detail/hash_float.hpp:
 
@@ -4057,8 +4077,6 @@ CameraBase.h:
 
 /usr/local/include/boost/exception/detail/error_info_impl.hpp:
 
-/usr/local/include/boost/exception/detail/shared_ptr.hpp:
-
 /usr/local/include/boost/exception/diagnostic_information.hpp:
 
 /usr/local/include/boost/exception/get_error_info.hpp:
@@ -4158,6 +4176,8 @@ CameraBase.h:
 /usr/local/include/boost/optional/bad_optional_access.hpp:
 
 /usr/local/include/boost/type_traits/has_nothrow_constructor.hpp:
+
+/usr/local/include/boost/type_traits/is_constructible.hpp:
 
 /usr/local/include/boost/type_traits/is_nothrow_move_assignable.hpp:
 
@@ -4316,8 +4336,6 @@ CameraBase.h:
 /usr/local/include/boost/variant/detail/hash_variant.hpp:
 
 /usr/local/include/boost/variant/static_visitor.hpp:
-
-/usr/local/include/boost/functional/hash_fwd.hpp:
 
 /usr/local/include/boost/aligned_storage.hpp:
 
