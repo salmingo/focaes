@@ -595,7 +595,7 @@ void ExposeComplete() {
 			camera->Expose(state.expdur, state.imgtype == IMGTYPE_OBJECT);
 		else {
 			ClearError();
-			PrintXY(1, LINE_STATUS, "exposure is aborted");
+			PrintXY(1, LINE_STATUS, "exposure is aborted. %s", camera->GetCameraInfo()->errmsg.c_str());
 		}
 	}
 	else if (state.mode != MODE_AUTO) {
@@ -627,7 +627,7 @@ void ExposeAbort() {
 	state.mode = MODE_INIT;
 	ShowCursor(false);
 	ClearError();
-	PrintXY(1, LINE_STATUS, "exposure is aborted");
+	PrintXY(1, LINE_STATUS, "exposure is aborted. %s", camera->GetCameraInfo()->errmsg.c_str());
 
 	mutex_lock lck(mtxcur);
 	MovetoXY(curpos, LINE_INPUT);
