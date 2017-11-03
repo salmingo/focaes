@@ -378,7 +378,7 @@ void CameraGY::ThreadReadout() {
 	boost::mutex mtx;
 	mutex_lock lck(mtx);
 	int64_t dt, limit_readout(100);
-	double limit_expose(10.0);
+	double limit_expose(10.0), noreply;
 
 	while(state_ != CAMERA_ERROR) {
 		waitread_.wait(lck);
@@ -392,7 +392,10 @@ void CameraGY::ThreadReadout() {
 
 			now = microsec_clock::universal_time();
 			td = now - nfcam_->tmobs;
-			if ((td.total_seconds() - nfcam_->eduration) > limit_expose) {// 错误: 未收到数据包
+			if ((noreply = (td.total_seconds() - nfcam_->eduration)) > limit_expose) {// 错误: 未收到数据包
+				char buff[200];
+				sprintf(buff, "long time<%.1f> no data respond", noreply);
+				nfcam_->errmsg = buff;
 				StopExpose();
 			}
 			else if (state_ == CAMERA_IMGRDY) {
