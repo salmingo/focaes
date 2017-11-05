@@ -157,6 +157,14 @@ protected:
 
 private:
 	/*!
+	 * @brief 计算帧头序号
+	 * @return
+	 * 帧序号
+	 * @note
+	 * 帧序号有效区间:[1, 65535], 逐一增加
+	 */
+	uint16_t MsgCount();
+	/*!
 	 * @brief 更改寄存器对应地址数值
 	 * @param addr 地址
 	 * @param val  数值

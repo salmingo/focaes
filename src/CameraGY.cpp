@@ -53,7 +53,7 @@ bool CameraGY::OpenCamera() {
 
 		msgcnt_ = 0;
 		do {
-			((uint16_t*)&buff1)[3] = htons(++msgcnt_);
+			((uint16_t*)&buff1)[3] = htons(MsgCount());
 			udpcmd_->write(buff1.c_array(), buff1.size());
 			buff2 = udpcmd_->block_read(bytercv);
 		} while (bytercv < 48 && ++trycnt < 3);
@@ -241,12 +241,16 @@ CAMERA_STATUS CameraGY::DownloadImage() {
 	return state;
 }
 
+uint16_t CameraGY::MsgCount() {
+	return (++msgcnt_ ? msgcnt_ : 1);
+}
+
 void CameraGY::Write(uint32_t addr, uint32_t val) {
 	mutex_lock lck(mtxReg_);
 	boost::array<uint8_t, 16> buff1 = {0x42, 0x01, 0x00, 0x82, 0x00, 0x08};
 	int n;
 
-	((uint16_t*) &buff1)[3] = htons(++msgcnt_);
+	((uint16_t*) &buff1)[3] = htons(MsgCount());
 	((uint32_t*) &buff1)[2] = htonl(addr);
 	((uint32_t*) &buff1)[3] = htonl(val);
 	udpcmd_->write(buff1.c_array(), buff1.size());
@@ -265,7 +269,7 @@ void CameraGY::Read(uint32_t addr, uint32_t &val) {
 	boost::array<uint8_t, 12> buff1 = {0x42, 0x01, 0x00, 0x80, 0x00, 0x04};
 	int n;
 
-	((uint16_t*) &buff1)[3] = htons(++msgcnt_);
+	((uint16_t*) &buff1)[3] = htons(MsgCount());
 	((uint32_t*) &buff1)[2] = htonl(addr);
 	udpcmd_->write(buff1.c_array(), buff1.size());
 	const uint8_t *buff2 = udpcmd_->block_read(n);
@@ -294,7 +298,7 @@ void CameraGY::Retransmit() {
 void CameraGY::Retransmit(uint32_t iPack0, uint32_t iPack1) {
 	mutex_lock lck(mtxReg_);
 	boost::array<uint8_t, 20> buff = {0x42, 0x00, 0x00, 0x40, 0x00, 0x0c};
-	((uint16_t*)&buff)[3] = htons(++msgcnt_);
+	((uint16_t*)&buff)[3] = htons(MsgCount());
 	((uint32_t*)&buff)[2] = htonl(idFrame_);
 	((uint32_t*)&buff)[3] = htonl(iPack0);
 	((uint32_t*)&buff)[4] = htonl(iPack1);
@@ -372,13 +376,13 @@ void CameraGY::ThreadHB() {
 }
 
 void CameraGY::ThreadReadout() {
-	boost::chrono::milliseconds period(100);	// 闲(非曝光)态心跳周期: 100毫秒
+	boost::chrono::milliseconds period(100);	// 周期: 100毫秒
 	ptime::time_duration_type td;
 	ptime now;
 	boost::mutex mtx;
 	mutex_lock lck(mtx);
 	int64_t dt, limit_readout(100);
-	double limit_expose(10.0), noreply;
+	double limit_expose(10.0);
 
 	while(state_ != CAMERA_ERROR) {
 		waitread_.wait(lck);
@@ -392,10 +396,7 @@ void CameraGY::ThreadReadout() {
 
 			now = microsec_clock::universal_time();
 			td = now - nfcam_->tmobs;
-			if ((noreply = (td.total_seconds() - nfcam_->eduration)) > limit_expose) {// 错误: 未收到数据包
-				char buff[200];
-				sprintf(buff, "long time<%.1f> no data respond", noreply);
-				nfcam_->errmsg = buff;
+			if ((td.total_seconds() - nfcam_->eduration) > limit_expose) {// 错误: 未收到数据包
 				StopExpose();
 			}
 			else if (state_ == CAMERA_IMGRDY) {
