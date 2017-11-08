@@ -18,7 +18,6 @@ CameraGY::CameraGY(const std::string& camIP) {
 	camIP_ 		= camIP;
 	expdur_		= UINT_MAX;
 	shtrmode_	= UINT_MAX;
-	gain_		= UINT_MAX;
 	msgcnt_		= 0;
 	tmdata_		= 0;
 	state_		= CAMERA_ERROR;
@@ -81,7 +80,7 @@ bool CameraGY::OpenCamera() {
 		packlen_ += 4; // 4: buffer header
 		packflag_.reset(new uint8_t[packtot_ + 1]);
 		bufpack_.reset(new uint8_t[(packtot_ + 1) * packlen_]);
-		Read(0x00020008, gain_);
+		Read(0x00020008, nfcam_->gain);
 		Read(0x0002000C, shtrmode_);
 		Read(0x00020010, expdur_);
 		// 启动心跳机制, 维护与相机间的网络连接
@@ -127,11 +126,11 @@ void CameraGY::UpdateReadRate(uint32_t& index) {
 
 // 设置增益
 void CameraGY::UpdateGain(uint32_t& index) {
-	if (index <= 2 && index != gain_) {
+	if (index <= 2 && index != nfcam_->gain) {
 		try {
 			Write(0x00020008, index);
 			Read(0x00020008, index);
-			gain_ = index;
+			nfcam_->gain = index;
 		}
 		catch(std::runtime_error& ex) {
 			nfcam_->errmsg = ex.what();
@@ -242,7 +241,8 @@ CAMERA_STATUS CameraGY::DownloadImage() {
 }
 
 uint16_t CameraGY::MsgCount() {
-	return (++msgcnt_ ? msgcnt_ : 1);
+	if (++msgcnt_ == 0) msgcnt_ = 1;
+	return msgcnt_;
 }
 
 void CameraGY::Write(uint32_t addr, uint32_t val) {

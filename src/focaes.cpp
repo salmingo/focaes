@@ -156,6 +156,7 @@ void PrintHelp() {
 	PrintXY(x, ++y, "\033[92;49m%s\033[0m", seps.c_str());
 	PrintXY(x, ++y, "* On <Camera_IP>            # connect camera. empty for U9000.       keyword: \033[93;49m\033[1mon\033[0m     *");
 	PrintXY(x, ++y, "* Off                       # disconnect camera.                     keyword: \033[93;49m\033[1moff\033[0m    *");
+	PrintXY(x, ++y, "* Gain <index>              # change gain                            keyword: \033[93;49m\033[1mG\033[0main   *");
 	PrintXY(x, ++y, "* Bias <count>              # take sequential BIAS image.            keyword: \033[93;49m\033[1mB\033[0mias   *");
 	PrintXY(x, ++y, "* Dark <duration> <count>   # take sequential DARK image.            keyword: \033[93;49m\033[1mD\033[0mark   *");
 	PrintXY(x, ++y, "* name <duration> <count>   # take sequential LIGHT image                            *");
@@ -556,7 +557,7 @@ bool SaveFITSFile() {
 	fits_write_key(fitsptr, TSTRING, "TIME-END", (void*)nfcam->timeend.c_str(), "UTC time of end observation", &status);
 	fits_write_key(fitsptr, TDOUBLE, "JD", &nfcam->jd, "Julian day of begin observation", &status);
 	fits_write_key(fitsptr, TDOUBLE, "EXPTIME", &nfcam->eduration, "exposure duration", &status);
-	fits_write_key(fitsptr, TDOUBLE, "GAIN", &nfcam->gain, "", &status);
+	fits_write_key(fitsptr, TUINT,   "GAIN", &nfcam->gain, "", &status);
 	fits_write_key(fitsptr, TDOUBLE, "TEMPSET", &nfcam->coolerset, "cooler set point", &status);
 	fits_write_key(fitsptr, TDOUBLE, "TEMPACT", &nfcam->coolerget, "cooler actual point", &status);
 	fits_write_key(fitsptr, TSTRING, "TERMTYPE", (void*)state.termtype.c_str(), "terminal type", &status);
@@ -849,7 +850,17 @@ int MainBody() {// 主工作流程
 					}
 				}
 			}
-			else if (!strcasecmp(token, "b") || !strcasecmp(token, "bias")) {// 尝试拍摄本底
+			else if (!(strcasecmp(token, "G") && strcasecmp(token, "gain"))) {// 查看或改变增益
+				if (!camera.unique() || !camera->IsConnected())
+					PrintXY(1, LINE_ERROR, "camera is off-line");
+				else if (state.mode != MODE_INIT)
+					PrintXY(1, LINE_ERROR, "camera being in exposure");
+				else {
+					if ((token = strtok(NULL, seps)) != NULL) camera->SetGain(uint32_t(atoi(token)));
+					PrintXY(1, LINE_STATUS, "gain = %d", camera->GetCameraInfo()->gain);
+				}
+			}
+			else if (!(strcasecmp(token, "b") && strcasecmp(token, "bias"))) {// 尝试拍摄本底
 				if (!camera.unique() || !camera->IsConnected())
 					PrintXY(1, LINE_ERROR, "camera is off-line");
 				else if (state.mode != MODE_INIT)
@@ -867,7 +878,7 @@ int MainBody() {// 主工作流程
 					}
 				}
 			}
-			else if (!strcasecmp(token, "d") || !strcasecmp(token, "dark")) {// 尝试拍摄暗场
+			else if (!(strcasecmp(token, "d") && strcasecmp(token, "dark"))) {// 尝试拍摄暗场
 				if (!camera.unique() || !camera->IsConnected())
 					PrintXY(1, LINE_ERROR, "camera is off-line");
 				else if (state.mode != MODE_INIT)

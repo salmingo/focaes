@@ -232,7 +232,7 @@ private:
 	std::string camIP_;		//< 相机IP地址
 	uint32_t expdur_;		//< 曝光时间, 量纲: 微秒
 	uint32_t shtrmode_;		//< 快门模式. 0: Normal; 1: AlwaysOpen; 2: AlwaysClose
-	uint32_t gain_;			//< 增益. 0: 1x; 1: 2x; 2: 3x. x: e-/ADU
+//	uint32_t gain_;			//< 增益. 0: 1x; 1: 2x; 2: 3x. x: e-/ADU
 	CAMERA_STATUS state_;	//< 工作状态
 	bool aborted_;			//< 中止曝光标识
 	/* 相关定义: 控制指令 */
