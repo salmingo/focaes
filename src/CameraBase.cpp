@@ -61,6 +61,10 @@ void CameraBase::Disconnect() {
 	}
 }
 
+bool CameraBase::Reboot() {
+	return false;
+}
+
 void CameraBase::SetCooler(double coolerset, bool onoff) {
 	if (!nfcam_->connected) return ;
 

@@ -49,6 +49,7 @@ bool CameraGY::OpenCamera() {
 		int bytercv, trycnt(0);
 		address_v4 addr1, addr2;
 		const uint8_t *buff2;
+		uint32_t val;
 
 		msgcnt_ = 0;
 		do {
@@ -67,9 +68,9 @@ bool CameraGY::OpenCamera() {
 		Write(0x0D04,     1500);		// Set PacketSize
 		Write(0x0D08,     0);			// Set PacketDelay
 		Write(0x0D18,     addrHost);	// Set GevSCDA
+		Write(0x0938,     0x2EE0);		// UDP keep time: 12000ms
 		Write(0xA000,     0x01);		// Start AcquisitionSequence
 		// 初始化监测量
-		uint32_t val;
 		Read(0xA004, val); nfcam_->wsensor = int(val);
 		Read(0xA008, val); nfcam_->hsensor = int(val);
 		byteimg_ = nfcam_->wsensor * nfcam_->hsensor * 2;
@@ -107,6 +108,17 @@ void CameraGY::CloseCamera() {
 	ExitThread(thReadout_);
 	udpdata_->close();
 	udpcmd_->close();
+}
+
+bool CameraGY::Reboot() {
+	try {
+		Write(0x20054, 0x12AB3C4D);
+		return true;
+	}
+	catch(std::runtime_error &ex) {
+		nfcam_->errmsg = ex.what();
+		return false;
+	}
 }
 
 // 设置制冷器工作模式及制冷温度
@@ -359,12 +371,14 @@ const char *CameraGY::UpdateNetwork(const uint32_t addr, const char *vstr) {
 void CameraGY::ThreadHB() {
 	boost::chrono::seconds period(2);	// 心跳周期: 2秒
 	int limit = 3; // 容错次数
+	uint32_t val;
 
 	while(hbfail_ < limit) {
 		boost::this_thread::sleep_for(period);
 
 		try {
-			Write(0x0938, 0x2EE0);
+//			Write(0x0938, 0x2EE0);
+			Read(0x0A00, val);
 			if (hbfail_) hbfail_ = 0;
 		}
 		catch(std::runtime_error& ex) {

@@ -207,6 +207,12 @@ public:
 	 */
 	void Disconnect();
 	/*!
+	 * @brief 重启相机
+	 * @return
+	 * 相机重启结果
+	 */
+	virtual bool Reboot();
+	/*!
 	 * @brief 设置制冷器工作模式及制冷温度
 	 * @param coolerset  期望温度, 量纲: 摄氏度
 	 * @param onoff      制冷器开关

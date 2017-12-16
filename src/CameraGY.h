@@ -55,6 +55,12 @@ public:
 public:
 	/* 虚函数, 继承类实现 */
 	/*!
+	 * @brief 重启相机
+	 * @return
+	 * 相机重启结果
+	 */
+	bool Reboot();
+	/*!
 	 * @brief 更改相机IP地址
 	 * @param ip 新的IP地址
 	 * @return
