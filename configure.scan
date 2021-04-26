@@ -3,7 +3,7 @@
 
 AC_PREREQ([2.69])
 AC_INIT([FULL-PACKAGE-NAME], [VERSION], [BUG-REPORT-ADDRESS])
-AC_CONFIG_SRCDIR([src/apgSampleCmn.cpp])
+AC_CONFIG_SRCDIR([src/CameraApogee.cpp])
 AC_CONFIG_HEADERS([config.h])
 
 # Checks for programs.

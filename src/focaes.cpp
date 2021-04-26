@@ -9,8 +9,8 @@
  */
 
 #include <boost/interprocess/ipc/message_queue.hpp>
-#include <longnam.h>
-#include <fitsio.h>
+#include <cfitsio/longnam.h>
+#include <cfitsio/fitsio.h>
 #include <xpa.h>
 #include "globaldef.h"
 #include "GLog.h"

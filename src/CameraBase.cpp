@@ -173,19 +173,19 @@ void CameraBase::ThreadExpose() {
 	boost::mutex mtx;    // 哑元
 	mutex_lock lck(mtx);
 	boost::chrono::milliseconds duration;	// 等待周期
-	double left, percent;
+	double left;
 	CAMERA_STATUS& status = nfcam_->state;
 	int ms;
 
 	while (true) {
 		condexp_.wait(lck);
 		while ((status = CameraState()) == CAMERA_EXPOSE) {// 监测曝光过程
-			nfcam_->check_expose(left, percent);
+			nfcam_->check_expose(left);
 			if (left > 0.1) ms = 100;
 			else ms = int(left * 1000);
 			duration = boost::chrono::milliseconds(ms);
 
-			exposeproc_(left, percent, (int) status);
+			exposeproc_(left, nfcam_->percent, (int) status);
 			if (ms > 0) boost::this_thread::sleep_for(duration);
 		}
 		if (status == CAMERA_IMGRDY) {

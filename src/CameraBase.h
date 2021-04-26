@@ -81,6 +81,7 @@ struct devcam_info {// 相机设备基本信息
 	double coolerget;		//< 芯片温度
 	ROI roi;				//< 有效ROI区
 	double eduration;		//< 曝光时间, 量纲: 秒
+	double percent;			//< 曝光进度
 	std::string dateobs;	//< 曝光起始时间对应的日期, 格式: CCYY-MM-DD
 	std::string timeobs;	//< 曝光起始时间对应的时间, 格式: hh:mm:ss.ssssss
 	std::string timeend;	//< 曝光结束时间对应的时间, 格式: hh:mm:ss.ssssss
@@ -144,7 +145,7 @@ public:
 	 * @return
 	 * 曝光未完成返回true, 否则返回false
 	 */
-	bool check_expose(double& left, double& percent) {
+	bool check_expose(double& left) {
 		ptime now(microsec_clock::universal_time());
 		boost::posix_time::time_duration elps = now - tmobs;
 		double dt = elps.total_microseconds() * 1E-6;
@@ -152,8 +153,8 @@ public:
 			left = 0.0;
 			percent = 100.000001;
 		}
-		else percent = dt * 100.000001 / eduration;
-		return percent <= 100.0;
+		else percent = dt * 100.01 / eduration;
+		return percent < 100.0;
 	}
 };
 /*!
