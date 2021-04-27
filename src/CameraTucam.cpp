@@ -14,6 +14,7 @@ using namespace boost::placeholders;
 
 CameraTucam::CameraTucam() {
 	state_ = CAMERA_IDLE;
+	expdur_= 0.0;
 }
 
 CameraTucam::~CameraTucam() {
@@ -43,7 +44,6 @@ bool CameraTucam::OpenCamera() {
 
 	// 分配图像存储空间并获取靶面分辨率
 	camFrm_.pBuffer = NULL;
-//	camFrm_.ucFormat = TUFRM_FMT_RAW;
 	camFrm_.ucFormatGet = TUFRM_FMT_RAW;
 	camFrm_.uiRsdSize = 1;
 	if (TUCAM_Buf_Alloc(camOpen_.hIdxTUCam, &camFrm_) != TUCAMRET_SUCCESS) {
@@ -52,7 +52,8 @@ bool CameraTucam::OpenCamera() {
 	}
 	nfcam_->wsensor = camFrm_.usWidth;
 	nfcam_->hsensor = camFrm_.usHeight;
-
+	expdur_= -1E30;
+	TUCAM_Cap_Start(camOpen_.hIdxTUCam, TUCCM_TRIGGER_SOFTWARE);
 	thrd_waitfrm_.reset(new boost::thread(boost::bind(&CameraTucam::thread_wait_frame, this)));
 
 	state_ = CAMERA_IDLE;
@@ -68,6 +69,7 @@ void CameraTucam::CloseCamera() {
 			while (state_ > CAMERA_IDLE)
 				boost::this_thread::sleep_for(d);
 		}
+		TUCAM_Cap_Stop(camOpen_.hIdxTUCam);
 		TUCAM_Buf_Release(camOpen_.hIdxTUCam);
 		TUCAM_Dev_Close(camOpen_.hIdxTUCam);
 	}
@@ -96,7 +98,10 @@ void CameraTucam::UpdateReadRate(uint32_t& index) {
 }
 
 void CameraTucam::UpdateGain(uint32_t& index) {
-	//...
+	double gain;
+	TUCAM_Prop_SetValue(camOpen_.hIdxTUCam, TUIDP_GLOBALGAIN, index);
+	TUCAM_Prop_GetValue(camOpen_.hIdxTUCam, TUIDP_GLOBALGAIN, &gain);
+	index = uint32_t(gain + 0.5);
 }
 
 void CameraTucam::UpdateROI(int& xbin, int& ybin, int& xstart, int& ystart, int& width, int& height) {
@@ -116,13 +121,16 @@ double CameraTucam::SensorTemperature() {
 }
 
 bool CameraTucam::StartExpose(double duration, bool light) {
-	bool rslt = TUCAM_Prop_SetValue(camOpen_.hIdxTUCam, TUIDP_EXPOSURETM, duration * 1000) == TUCAMRET_SUCCESS
-			&& TUCAM_Cap_Start(camOpen_.hIdxTUCam, TUCCM_TRIGGER_STANDARD) == TUCAMRET_SUCCESS;
-	if (rslt) {
+	if (duration != expdur_
+			&& TUCAM_Prop_SetValue(camOpen_.hIdxTUCam, TUIDP_EXPOSURETM, duration * 1000) == TUCAMRET_SUCCESS) {
+		expdur_ = duration;
+	}
+	if (TUCAM_Cap_DoSoftwareTrigger(camOpen_.hIdxTUCam) == TUCAMRET_SUCCESS) {
 		state_ = CAMERA_EXPOSE;
 		cv_waitfrm_.notify_one();
+		return true;
 	}
-	return rslt;
+	return false;
 }
 
 void CameraTucam::StopExpose() {
@@ -141,7 +149,8 @@ CAMERA_STATUS CameraTucam::CameraState() {
 CAMERA_STATUS CameraTucam::DownloadImage() {
 	int n = nfcam_->roi.get_width() * nfcam_->roi.get_height();
 	memcpy(nfcam_->data.get(), camFrm_.pBuffer + camFrm_.usHeader, n * sizeof(unsigned short));
-	return state_;
+	state_ = CAMERA_IDLE;
+	return CAMERA_IMGRDY;
 }
 
 void CameraTucam::thread_wait_frame() {
@@ -151,7 +160,6 @@ void CameraTucam::thread_wait_frame() {
 
 	while (true) {
 		cv_waitfrm_.wait(lck); // 等待曝光起始信号
-		camFrm_.ucFormatGet = TUFRM_FMT_RAW;
 		if ((code = TUCAM_Buf_WaitForFrame(camOpen_.hIdxTUCam, &camFrm_)) == TUCAMRET_SUCCESS) {
 			TUCAM_Buf_CopyFrame(camOpen_.hIdxTUCam, &camFrm_);
 			state_ = CAMERA_IMGRDY;
@@ -159,6 +167,5 @@ void CameraTucam::thread_wait_frame() {
 		else {
 			state_ = code == TUCAMRET_ABORT ? CAMERA_IDLE : CAMERA_ERROR;
 		}
-		TUCAM_Cap_Stop(camOpen_.hIdxTUCam);
 	}
 }

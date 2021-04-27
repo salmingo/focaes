@@ -21,6 +21,7 @@ protected:
 	TUCAM_OPEN camOpen_;	/// 相机打开参数
 	TUCAM_FRAME camFrm_;	/// 图像帧数据
 	CAMERA_STATUS state_;	/// 相机工作状态, 指示曝光过程
+	double expdur_;			/// 曝光时间
 	threadptr thrd_waitfrm_;/// 线程: 等待读出图像
 	boost::condition_variable cv_waitfrm_;	/// 条件: 曝光开始, 等待可以读出图像数据
 
