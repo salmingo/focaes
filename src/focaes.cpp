@@ -22,6 +22,7 @@
 #include "CameraBase.h"
 #include "CameraApogee.h"
 #include "CameraGY.h"
+#include "CameraTucam.h"
 #include "FileTransferClient.h"
 
 //////////////////////////////////////////////////////////////////////////////
@@ -154,7 +155,7 @@ void PrintHelp() {
 
 	ShowCursor(false);
 	PrintXY(x, ++y, "\033[92;49m%s\033[0m", seps.c_str());
-	PrintXY(x, ++y, "* On <Camera_IP>            # connect camera. empty for U9000.       keyword: \033[93;49m\033[1mon\033[0m     *");
+	PrintXY(x, ++y, "* On <Camera IP/ID>         # connect camera. empty for U9000.       keyword: \033[93;49m\033[1mon\033[0m     *");
 	PrintXY(x, ++y, "* Off                       # disconnect camera.                     keyword: \033[93;49m\033[1moff\033[0m    *");
 	PrintXY(x, ++y, "* Reboot                    # reboot camera.                         keyword: \033[93;49m\033[1mreboot\033[0m *");
 	PrintXY(x, ++y, "* Gain <index>              # change gain                            keyword: \033[93;49m\033[1mG\033[0main   *");
@@ -800,14 +801,7 @@ int MainBody() {// 主工作流程
 					boost::format fmt("%03d");
 					int cid;
 
-					if ((token = strtok(NULL, seps)) == NULL || atoi(token) == 5) {// U9000
-						fmt % (atoi(param.unitid.c_str()) * 10 + 5); // 相机编号编码格式1
-						state.cid = fmt.str();
-						state.termtype = "FFoV";
-						boost::shared_ptr<CameraApogee> ccd = boost::make_shared<CameraApogee>();
-						camera = boost::static_pointer_cast<CameraBase>(ccd);
-					}
-					else {// GWAC GY
+					if ((token = strtok(NULL, seps)) != NULL && strstr(token, ".") != NULL) {// GWAC/ GY CCD
 						using boost::asio::ip::address_v4;
 						std::string camip = token;
 						address_v4 addr = address_v4::from_string(camip.c_str());
@@ -817,12 +811,21 @@ int MainBody() {// 主工作流程
 						boost::shared_ptr<CameraGY> ccd = boost::make_shared<CameraGY>(camip);
 						camera = boost::static_pointer_cast<CameraGY>(ccd);
 					}
-					if (!camera->Connect()) {
-						PrintXY(1, LINE_ERROR, "failed to connect camera: %s", camera->GetCameraInfo()->errmsg.c_str());
-						camera.reset();
-						state.reset();
+					else if (token == NULL || (cid = atoi(token)) == 5) {// U9000
+						fmt % (atoi(param.unitid.c_str()) * 10 + 5); // 相机编号编码格式1
+						state.cid = fmt.str();
+						state.termtype = "FFoV";
+						boost::shared_ptr<CameraApogee> ccd = boost::make_shared<CameraApogee>();
+						camera = boost::static_pointer_cast<CameraBase>(ccd);
 					}
-					else {
+					else if (cid >= 1 && cid <= 4){// CMOS: Dhyana 4040
+						fmt % (atoi(param.unitid.c_str()) * 10 + cid); // 相机编号编码格式1
+						state.cid = fmt.str();
+						state.termtype = "JFoV";
+						boost::shared_ptr<CameraTucam> ccd = boost::make_shared<CameraTucam>();
+						camera = boost::static_pointer_cast<CameraBase>(ccd);
+					}
+					if (camera.unique() && camera->Connect()) {
 						PrintXY(1, LINE_STATUS, "camera<%s> connected", state.cid.c_str());
 						ClearError();
 						const ExposeProcess::slot_type& slot = boost::bind(&ExposeProcessCB, _1, _2, _3);
@@ -831,6 +834,11 @@ int MainBody() {// 主工作流程
 						if (param.bfts && ftcli.unique()) {
 							ftcli->SetDeviceID(param.grpid, param.unitid, state.cid);
 						}
+					}
+					else {
+						PrintXY(1, LINE_ERROR, "failed to connect camera: %s", camera->GetCameraInfo()->errmsg.c_str());
+						camera.reset();
+						state.reset();
 					}
 				}
 			}
